@@ -10,7 +10,7 @@ export default function Home() {
   return (
     <Layout>
       <div className="page">
-        <h1>Hello world - fixed https</h1>
+        <h1>42 Progress</h1>
         <main></main>
       </div>
       <style jsx>{`
