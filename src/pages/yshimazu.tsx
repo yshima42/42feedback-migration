@@ -5,7 +5,7 @@ import { Heading } from "@chakra-ui/react";
 const YshimzuPage = () => {
   return (
     <Layout>
-      <Heading>yshimazu</Heading>
+      <Heading>yshimazu - lint practice</Heading>
       <LineChartSample />
     </Layout>
   );
