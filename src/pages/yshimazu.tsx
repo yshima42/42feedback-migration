@@ -1,14 +1,19 @@
 import { Layout } from "@/components/Layout";
 import { LineChartSample } from "@/components/LineChartSample";
 import { Heading } from "@chakra-ui/react";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
 
-const YshimzuPage = () => {
+const YshimazuPage = () => {
+  const { data: session } = useSession();
+  console.log(session?.accessToken);
+
   return (
     <Layout>
-      <Heading>yshimazu - lint practice</Heading>
+      <Heading>yshimazu</Heading>
       <LineChartSample />
     </Layout>
   );
 };
 
-export default YshimzuPage;
+export default YshimazuPage;

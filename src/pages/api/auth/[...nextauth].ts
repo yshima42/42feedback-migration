@@ -13,4 +13,16 @@ const options = {
     }),
   ],
   secret: process.env.SECRET,
+  callbacks: {
+    async jwt({ token, account, profile }: any) {
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
+    async session({ session, token, user }: any) {
+      session.accessToken = token.accessToken;
+      return session;
+    },
+  },
 };
