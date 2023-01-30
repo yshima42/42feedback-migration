@@ -14,7 +14,10 @@ const SameGrade = () => {
   useEffect(() => {
     setIsLoading(false);
     fetch(ftUrl, {
-      headers: { Authorization: `Bearer ${session?.accessToken}` },
+      headers: {
+        Authorization: `Bearer ${session?.accessToken}`,
+        "Access-Control-Allow-Origin": "https://42progress.vercel.app",
+      },
     })
       .then((res) => res.json())
       .then((json) => {
