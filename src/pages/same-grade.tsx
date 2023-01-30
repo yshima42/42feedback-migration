@@ -7,19 +7,20 @@ import { useEffect, useState } from "react";
 const SameGrade = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com/todos/1";
   const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
   const { data: session } = useSession();
   console.log(session?.accessToken);
 
   useEffect(() => {
     setIsLoading(false);
-    fetch(jsonplaceholderUrl)
+    fetch(ftUrl, {
+      headers: { Authorization: `Bearer ${session?.accessToken}` },
+    })
       .then((res) => res.json())
       .then((json) => {
         setData(json);
       });
-  }, []);
+  }, [session?.accessToken]);
 
   if (isLoading) {
     return <p>Loading...</p>;
