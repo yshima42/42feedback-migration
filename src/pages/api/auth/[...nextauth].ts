@@ -4,6 +4,7 @@ import { AdapterUser } from "next-auth/adapters";
 import { JWT } from "next-auth/jwt";
 import FortyTwoProvider from "next-auth/providers/42-school";
 
+// node_modules/next-auth/types/index.d.tsから引用
 type sessionType = { session: Session; user: User | AdapterUser; token: JWT };
 type jwtType = {
   token: JWT;
