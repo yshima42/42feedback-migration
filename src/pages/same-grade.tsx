@@ -22,6 +22,9 @@ const SameGrade = () => {
       .then((res) => res.json())
       .then((json) => {
         setData(json);
+      })
+      .catch((error) => {
+        console.error("Error: ", error);
       });
   }, [session?.accessToken]);
 
