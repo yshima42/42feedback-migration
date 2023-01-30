@@ -11,11 +11,13 @@ const SameGrade = () => {
   const { data: session } = useSession();
   console.log(session?.accessToken);
   console.log("Debugging...");
+  console.log("add method");
 
   useEffect(() => {
     setIsLoading(false);
     fetch(ftUrl, {
       headers: {
+        method: "GET",
         Authorization: `Bearer ${session?.accessToken}`,
         mode: "cors",
       },
