@@ -10,19 +10,21 @@ const SameGrade = () => {
   const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
   const { data: session } = useSession();
   console.log(session?.accessToken);
+  console.log("Debugging...");
 
   useEffect(() => {
     setIsLoading(false);
     fetch(ftUrl, {
       headers: {
         Authorization: `Bearer ${session?.accessToken}`,
-        "Access-Control-Allow-Origin":
-          "https://42progress-git-dev-yshima42.vercel.app",
+        mode: "cors",
       },
     })
       .then((res) => {
         if (!res.ok) {
           console.log("Error: ", res.status);
+        } else {
+          console.log("OK: ", res.status);
         }
         return res.json();
       })
