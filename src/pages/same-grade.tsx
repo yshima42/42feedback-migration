@@ -16,15 +16,21 @@ const SameGrade = () => {
     fetch(ftUrl, {
       headers: {
         Authorization: `Bearer ${session?.accessToken}`,
-        "Access-Control-Allow-Origin": "https://42progress.vercel.app",
+        "Access-Control-Allow-Origin":
+          "https://42progress-git-dev-yshima42.vercel.app",
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          console.log("Error: ", res.status);
+        }
+        return res.json();
+      })
       .then((json) => {
         setData(json);
       })
       .catch((error) => {
-        console.error("Error: ", error);
+        console.error("Catch Error: ", error);
       });
   }, [session?.accessToken]);
 
