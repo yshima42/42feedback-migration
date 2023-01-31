@@ -36,7 +36,7 @@ const SameGrade = () => {
       .catch((error) => {
         console.error("Catch Error: ", error);
       });
-  }, [session?.accessToken]);
+  }, [session]);
 
   if (isLoading) {
     return <p>Loading...</p>;
