@@ -24,7 +24,7 @@ const GithubPage = () => {
 
   return (
     <Layout>
-      <Heading>github practice</Heading>
+      <Heading>github practice-dev</Heading>
     </Layout>
   );
 };
