@@ -20,7 +20,6 @@ const SameGrade = () => {
         method: "GET",
         Authorization: `Bearer ${session?.accessToken}`,
         mode: "cors",
-        "content-type": "application/x-www-form-urlencoded",
       },
     })
       .then((res) => {
