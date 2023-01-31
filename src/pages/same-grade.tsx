@@ -10,15 +10,31 @@ const SameGrade = () => {
   const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
   const { data: session } = useSession();
   console.log(session?.accessToken);
+  console.log("Debugging...");
+  console.log("add method");
 
   useEffect(() => {
     setIsLoading(false);
     fetch(ftUrl, {
-      headers: { Authorization: `Bearer ${session?.accessToken}` },
+      headers: {
+        method: "GET",
+        Authorization: `Bearer ${session?.accessToken}`,
+        mode: "cors",
+      },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          console.log("Error: ", res.status);
+        } else {
+          console.log("OK: ", res.status);
+        }
+        return res.json();
+      })
       .then((json) => {
         setData(json);
+      })
+      .catch((error) => {
+        console.error("Catch Error: ", error);
       });
   }, [session?.accessToken]);
 
