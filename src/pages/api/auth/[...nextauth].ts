@@ -4,6 +4,7 @@ import { AdapterUser } from "next-auth/adapters";
 import { DefaultJWT, JWT } from "next-auth/jwt";
 import { Account, DefaultSession, Profile, Session, User } from "next-auth";
 import FortyTwoProvider from "next-auth/providers/42-school";
+import GitHubProvider from "next-auth/providers/github";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -38,6 +39,10 @@ const options = {
     FortyTwoProvider({
       clientId: process.env.FORTY_TWO_CLIENT_ID as string,
       clientSecret: process.env.FORTY_TWO_CLIENT_SECRET as string,
+    }),
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID as string,
+      clientSecret: process.env.GITHUB_SECRET as string,
     }),
   ],
   secret: process.env.SECRET,
