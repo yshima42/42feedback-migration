@@ -4,8 +4,6 @@ import { Heading } from "@chakra-ui/react";
 import { getToken } from "next-auth/jwt";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
-const API = "https://api.github.com/graphql";
-
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
@@ -36,7 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (
 const YshimazuPage = (props: { data: any }) => {
   return (
     <Layout>
-      <Heading>yshimazu </Heading>
+      <Heading>yshimazu - 42api</Heading>
       <p>{JSON.stringify(props.data)}</p>
       <LineChartSample />
     </Layout>
