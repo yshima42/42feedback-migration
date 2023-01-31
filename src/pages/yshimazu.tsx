@@ -2,7 +2,7 @@ import { Layout } from "@/components/Layout";
 import { LineChartSample } from "@/components/LineChartSample";
 import { Heading } from "@chakra-ui/react";
 
-const YshimzuPage = () => {
+const YshimazuPage = () => {
   return (
     <Layout>
       <Heading>yshimazu - dev practice</Heading>
@@ -11,4 +11,4 @@ const YshimzuPage = () => {
   );
 };
 
-export default YshimzuPage;
+export default YshimazuPage;
