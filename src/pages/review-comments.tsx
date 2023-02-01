@@ -52,7 +52,9 @@ const ReviewComments = (props: { data: any }) => {
       <div>
         {data.map((value: any) => (
           <div key={value["id"]}>
-            {value["comment"]}
+            final_mark: {value["final_mark"]}
+            <br />
+            comment: {value["comment"]}
             <br />
             <br />
           </div>
