@@ -44,16 +44,20 @@ export const getServerSideProps: GetServerSideProps = async (
 };
 
 const ReviewComments = (props: { data: any }) => {
+  const { data } = props;
+
   return (
     <Layout>
       <Heading>review-comments</Heading>
-      <p>
-        {JSON.stringify(
-          props.data.map((value: any) => {
-            return value["comment"];
-          })
-        )}
-      </p>
+      <div>
+        {data.map((value: any) => (
+          <div key={value["id"]}>
+            {value["comment"]}
+            <br />
+            <br />
+          </div>
+        ))}
+      </div>
     </Layout>
   );
 };
