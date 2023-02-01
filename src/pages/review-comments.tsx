@@ -14,7 +14,6 @@ export const getServerSideProps: GetServerSideProps = async (
   let data = [];
 
   if (token) {
-    // console.log("token: ", token.accessToken);
     const res = await fetch(
       `https://api.intra.42.fr/v2/projects/${PROJECT_ID}/scale_teams?
       page[size]=100
@@ -26,9 +25,7 @@ export const getServerSideProps: GetServerSideProps = async (
         },
       }
     );
-
     data = await res.json();
-    console.log(data);
   } else {
     console.log("no token");
   }
