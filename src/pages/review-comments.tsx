@@ -47,7 +47,13 @@ const ReviewComments = (props: { data: any }) => {
   return (
     <Layout>
       <Heading>review-comments</Heading>
-      <p>{JSON.stringify(props.data)}</p>
+      <p>
+        {JSON.stringify(
+          props.data.map((value: any) => {
+            return value["comment"];
+          })
+        )}
+      </p>
     </Layout>
   );
 };
