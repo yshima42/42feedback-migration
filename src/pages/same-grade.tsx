@@ -4,41 +4,44 @@ import { Heading } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getToken } from "next-auth/jwt";
 
+type Props = {
+  data?: any;
+  statusText?: string;
+};
+
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
-  const token = await getToken({ req: context.req });
-  let data = {};
 
-  // try-catchで書き直す
-  if (token) {
-    console.log("token: ", token.accessToken);
+  try {
+    const token = await getToken({ req: context.req });
     const res = await fetch(ftUrl, {
       headers: {
         Authorization: "Bearer " + token?.accessToken,
       },
     });
-
-    data = await res.json();
-    console.log(data);
-  } else {
-    console.log("no token");
+    if (!res.ok) {
+      throw new Error(res.statusText);
+    }
+    const data = await res.json();
+    return { props: { data } };
+  } catch (error) {
+    console.error("Could not fetch data from 42 API\n", error);
+    const statusText = error instanceof Error ? error.message : "Unknown error";
+    return { props: { statusText } };
   }
-
-  return {
-    props: {
-      data,
-    },
-  };
 };
 
-const SameGrade = (props: { data: any }) => {
+const SameGrade = ({ data, statusText }: Props) => {
+  if (statusText) {
+    return <p>{statusText}</p>;
+  }
   return (
     <Layout>
       <Heading>Same Grade</Heading>
       <LineChartSample />
-      <p>{JSON.stringify(props.data)}</p>
+      <p>{JSON.stringify(data)}</p>
     </Layout>
   );
 };
