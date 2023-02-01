@@ -13,7 +13,7 @@ export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const token = await getToken({ req: context.req });
-  let data = [];
+  let data: Feedbacks[] = [];
 
   if (token) {
     const res = await fetch(
