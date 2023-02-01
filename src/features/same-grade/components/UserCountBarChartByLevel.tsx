@@ -11,11 +11,11 @@ import {
 } from "recharts";
 
 type Props = {
-  studentCountByLevel: number[];
+  userCountByLevel: number[];
 };
 
-export const StudentCountBarChartByLevel = ({ studentCountByLevel }: Props) => {
-  const data = studentCountByLevel.map((count: number, index) => {
+export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
+  const data = userCountByLevel.map((count: number, index) => {
     return {
       name: `${index}`,
       "Number of students": count,

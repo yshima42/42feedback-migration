@@ -1,19 +1,21 @@
 import { Layout } from "@/components/Layout";
-import { StudentCountBarChartByLevel } from "@/features/same-grade/components/StudentCountBarChartByLevel";
+import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
 import { Heading } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getToken, JWT } from "next-auth/jwt";
+import { CursusUser } from "next-auth/providers/42-school";
+import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 
 type Props = {
-  data?: any;
+  data?: CursusUser[];
   statusText?: string;
 };
 
-// ログインユーザーの入学月を取得
-const getLoginUserAdmissionMonth = async (token: JWT) => {
+// ログインユーザーの入学日を取得
+const getLoginUserAdmissionDate = async (token: JWT) => {
   const userId = token?.sub;
   const res = await fetch(
-    `https://api.intra.42.fr/v2/cursus/21/cursus_users?filter[user_id]=${userId}`,
+    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[user_id]=${userId}`,
     {
       headers: {
         Authorization: "Bearer " + token?.accessToken,
@@ -23,17 +25,15 @@ const getLoginUserAdmissionMonth = async (token: JWT) => {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  const data = await res.json();
-  return data[0].begin_at;
-  // return data[0].begin_at.slice(5, 7);
+  const loginUser: CursusUser[] = await res.json();
+  return loginUser[0].begin_at;
 };
 
-// ログインユーザーの入学月と同じ月のユーザーを取得
+// ログインユーザーと同じ日に入学したユーザーを取得
 const getSameGradeUsers = async (token: JWT) => {
-  const loginUserAdmissionMonth = await getLoginUserAdmissionMonth(token ?? {});
-  console.log("begin_at:" + loginUserAdmissionMonth);
+  const loginUserAdmissionDate = await getLoginUserAdmissionDate(token);
   const res = await fetch(
-    `https://api.intra.42.fr/v2/cursus/21/cursus_users?filter[campus_id]=26&filter[begin_at]=${loginUserAdmissionMonth}&page[size]=100`,
+    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}&filter[begin_at]=${loginUserAdmissionDate}&page[size]=100`,
     {
       headers: {
         Authorization: "Bearer " + token?.accessToken,
@@ -43,8 +43,8 @@ const getSameGradeUsers = async (token: JWT) => {
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  const data = await res.json();
-  return data;
+  const sameGradeUsers: CursusUser[] = await res.json();
+  return sameGradeUsers;
 };
 
 export const getServerSideProps: GetServerSideProps = async (
@@ -52,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (
 ) => {
   try {
     const token = await getToken({ req: context.req });
-    console.log(token);
     if (!token) {
       throw new Error("No token found");
     }
@@ -65,27 +64,27 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 };
 
-const countStudentByLevel = (data: any) => {
-  const studentCountByLevel: number[] = [];
-  data.forEach((cursusUser: any) => {
-    if (studentCountByLevel[Math.floor(cursusUser.level)]) {
-      studentCountByLevel[Math.floor(cursusUser.level)]++;
+const countUserByLevel = (users: CursusUser[]) => {
+  const userCountByLevel: number[] = [];
+  users.forEach((user) => {
+    if (userCountByLevel[Math.floor(user.level)]) {
+      userCountByLevel[Math.floor(user.level)]++;
     } else {
-      studentCountByLevel[Math.floor(cursusUser.level)] = 1;
+      userCountByLevel[Math.floor(user.level)] = 1;
     }
   });
-  return studentCountByLevel;
+  return userCountByLevel;
 };
 
 const SameGrade = ({ data, statusText }: Props) => {
-  if (statusText) {
-    return <p>{statusText}</p>;
+  if (statusText || !data) {
+    return <p>{statusText ?? "Empty Data"}</p>;
   }
-  const studentCountByLevel = countStudentByLevel(data);
+  const userCountByLevel = countUserByLevel(data);
   return (
     <Layout>
       <Heading>Same Grade</Heading>
-      <StudentCountBarChartByLevel studentCountByLevel={studentCountByLevel} />
+      <UserCountBarChartByLevel userCountByLevel={userCountByLevel} />
     </Layout>
   );
 };
