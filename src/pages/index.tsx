@@ -15,9 +15,7 @@ const Home = () => {
       <Heading>42 Progress</Heading>
       <Link href="/same-grade">same grade progress(名前ダサいから変える)</Link>
       <br />
-      <Link href="/yshimazu">yshimazu</Link>
-      <br />
-      <Link href="/github-practice">github</Link>
+      <Link href="/review-comments">review comments</Link>
     </Layout>
   );
 };
