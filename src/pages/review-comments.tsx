@@ -2,6 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
 import { getToken } from "next-auth/jwt";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { Feedbacks } from "@/type/type";
 
 const PROJECT_ID = 1331;
 const CURSUS_ID = 21;
@@ -38,7 +39,11 @@ export const getServerSideProps: GetServerSideProps = async (
   };
 };
 
-const ReviewComments = (props: { data: any }) => {
+type Props = {
+  data: Feedbacks[];
+};
+
+const ReviewComments = (props: Props) => {
   const { data } = props;
 
   return (
