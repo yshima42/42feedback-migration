@@ -50,7 +50,7 @@ const ReviewComments = (props: Props) => {
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {data.map((value: any) => (
+        {data.map((value: Feedbacks) => (
           <div key={value["id"]}>
             reviewer: {value["corrector"]["login"]}
             <br />
