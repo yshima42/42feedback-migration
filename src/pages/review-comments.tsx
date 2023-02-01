@@ -31,14 +31,14 @@ export const getServerSideProps: GetServerSideProps = async (
   };
 };
 
-const YshimazuPage = (props: { data: any }) => {
+const ReviewComments = (props: { data: any }) => {
   return (
     <Layout>
-      <Heading>yshimazu - 42api</Heading>
+      <Heading>review-comments</Heading>
       <p>{JSON.stringify(props.data)}</p>
       <LineChartSample />
     </Layout>
   );
 };
 
-export default YshimazuPage;
+export default ReviewComments;
