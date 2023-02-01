@@ -1,10 +1,8 @@
 import { Layout } from "@/components/Layout";
-import { LineChartSample } from "@/components/LineChartSample";
+import { StudentCountBarChartByLevel } from "@/features/same-grade/components/StudentCountBarChartByLevel";
 import { Heading } from "@chakra-ui/react";
-import { IncomingMessage } from "http";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getToken, JWT } from "next-auth/jwt";
-import { getSession } from "next-auth/react";
 
 type Props = {
   data?: any;
@@ -67,25 +65,27 @@ export const getServerSideProps: GetServerSideProps = async (
   }
 };
 
+const countStudentByLevel = (data: any) => {
+  const studentCountByLevel: number[] = [];
+  data.forEach((cursusUser: any) => {
+    if (studentCountByLevel[Math.floor(cursusUser.level)]) {
+      studentCountByLevel[Math.floor(cursusUser.level)]++;
+    } else {
+      studentCountByLevel[Math.floor(cursusUser.level)] = 1;
+    }
+  });
+  return studentCountByLevel;
+};
+
 const SameGrade = ({ data, statusText }: Props) => {
   if (statusText) {
     return <p>{statusText}</p>;
   }
-  console.log(data.length);
+  const studentCountByLevel = countStudentByLevel(data);
   return (
     <Layout>
       <Heading>Same Grade</Heading>
-      <LineChartSample />
-      <p>
-        {data?.map((cursusUser: any) => {
-          return (
-            <div key={cursusUser.id}>
-              <p>{cursusUser.user.login}</p>
-              <p>{cursusUser.level}</p>
-            </div>
-          );
-        })}
-      </p>
+      <StudentCountBarChartByLevel studentCountByLevel={studentCountByLevel} />
     </Layout>
   );
 };
