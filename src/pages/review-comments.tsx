@@ -3,6 +3,7 @@ import { Heading } from "@chakra-ui/react";
 import { getToken } from "next-auth/jwt";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { Feedbacks } from "@/type/type";
+import Link from "next/link";
 
 const PROJECT_ID = 1331;
 const CURSUS_ID = 21;
@@ -52,7 +53,12 @@ const ReviewComments = (props: Props) => {
       <div>
         {data.map((value: Feedbacks) => (
           <div key={value["id"]}>
-            reviewer: {value["corrector"]["login"]}
+            reviewer:{" "}
+            <Link
+              href={`https://profile.intra.42.fr/users/${value["corrector"]["login"]}`}
+            >
+              {value["corrector"]["login"]}
+            </Link>
             <br />
             final_mark: {value["final_mark"]}
             <br />
