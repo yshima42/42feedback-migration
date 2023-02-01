@@ -16,7 +16,8 @@ export const getServerSideProps: GetServerSideProps = async (
   if (token) {
     const res = await fetch(
       `https://api.intra.42.fr/v2/projects/${PROJECT_ID}/scale_teams?
-      page[size]=100
+      &page[size]=100
+      &page[number]=1
       &filter[cursus_id]=${CURSUS_ID}
       &filter[campus_id]=${CAMPUS_ID}`,
       {
@@ -46,6 +47,8 @@ const ReviewComments = (props: { data: any }) => {
       <div>
         {data.map((value: any) => (
           <div key={value["id"]}>
+            reviewer: {value["corrector"]["login"]}
+            <br />
             final_mark: {value["final_mark"]}
             <br />
             comment: {value["comment"]}
