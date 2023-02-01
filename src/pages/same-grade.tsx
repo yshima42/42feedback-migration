@@ -1,55 +1,44 @@
 import { Layout } from "@/components/Layout";
 import { LineChartSample } from "@/components/LineChartSample";
 import { Heading } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { getToken } from "next-auth/jwt";
 
-const SameGrade = () => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
-  const { data: session } = useSession();
-  console.log(session?.accessToken);
-  console.log("Debugging...");
-  console.log("add method");
+  const token = await getToken({ req: context.req });
+  let data = {};
 
-  useEffect(() => {
-    setIsLoading(false);
-    fetch(ftUrl, {
+  // try-catchで書き直す
+  if (token) {
+    console.log("token: ", token.accessToken);
+    const res = await fetch(ftUrl, {
       headers: {
-        method: "GET",
-        Authorization: `Bearer ${session?.accessToken}`,
-        mode: "cors",
+        Authorization: "Bearer " + token?.accessToken,
       },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.log("Error: ", res.status);
-        } else {
-          console.log("OK: ", res.status);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setData(json);
-      })
-      .catch((error) => {
-        console.error("Catch Error: ", error);
-      });
-  }, [session?.accessToken]);
+    });
 
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-  if (!data) {
-    return <p>No data</p>;
+    data = await res.json();
+    console.log(data);
+  } else {
+    console.log("no token");
   }
 
+  return {
+    props: {
+      data,
+    },
+  };
+};
+
+const SameGrade = (props: { data: any }) => {
   return (
     <Layout>
       <Heading>Same Grade</Heading>
       <LineChartSample />
-      <p>{JSON.stringify(data)}</p>
+      <p>{JSON.stringify(props.data)}</p>
     </Layout>
   );
 };
