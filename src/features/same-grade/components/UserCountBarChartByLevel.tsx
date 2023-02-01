@@ -17,7 +17,7 @@ type Props = {
 export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
   const data = userCountByLevel.map((count: number, index) => {
     return {
-      name: `${index}`,
+      level: `${index}`,
       "Number of students": count,
     };
   });
@@ -35,7 +35,7 @@ export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name">
+      <XAxis dataKey="level">
         <Label value="Level" offset={0} position="insideBottom" />
       </XAxis>
       <YAxis>
