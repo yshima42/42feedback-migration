@@ -85,6 +85,7 @@ export const getStaticProps: GetStaticProps = async () => {
   } catch (error) {
     return {
       props: {
+        projectReviews,
         error,
       },
     };
