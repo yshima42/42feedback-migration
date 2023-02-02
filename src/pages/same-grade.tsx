@@ -1,55 +1,90 @@
 import { Layout } from "@/components/Layout";
-import { LineChartSample } from "@/components/LineChartSample";
+import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
 import { Heading } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { getToken, JWT } from "next-auth/jwt";
+import { CursusUser } from "next-auth/providers/42-school";
+import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 
-const SameGrade = () => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
-  const { data: session } = useSession();
-  console.log(session?.accessToken);
-  console.log("Debugging...");
-  console.log("add method");
+type Props = {
+  data?: CursusUser[];
+  statusText?: string;
+};
 
-  useEffect(() => {
-    setIsLoading(false);
-    fetch(ftUrl, {
+// ログインユーザーの入学日を取得
+const getLoginUserAdmissionDate = async (token: JWT) => {
+  const userId = token?.sub;
+  const res = await fetch(
+    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[user_id]=${userId}`,
+    {
       headers: {
-        method: "GET",
-        Authorization: `Bearer ${session?.accessToken}`,
-        mode: "cors",
+        Authorization: "Bearer " + token?.accessToken,
       },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.log("Error: ", res.status);
-        } else {
-          console.log("OK: ", res.status);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setData(json);
-      })
-      .catch((error) => {
-        console.error("Catch Error: ", error);
-      });
-  }, [session?.accessToken]);
-
-  if (isLoading) {
-    return <p>Loading...</p>;
+    }
+  );
+  if (!res.ok) {
+    throw new Error(res.statusText);
   }
-  if (!data) {
-    return <p>No data</p>;
-  }
+  const loginUser: CursusUser[] = await res.json();
+  return loginUser[0].begin_at;
+};
 
+// ログインユーザーと同じ日に入学したユーザーを取得
+const getSameGradeUsers = async (token: JWT) => {
+  const loginUserAdmissionDate = await getLoginUserAdmissionDate(token);
+  const res = await fetch(
+    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}&filter[begin_at]=${loginUserAdmissionDate}&page[size]=100`,
+    {
+      headers: {
+        Authorization: "Bearer " + token?.accessToken,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error(res.statusText);
+  }
+  const sameGradeUsers: CursusUser[] = await res.json();
+  return sameGradeUsers;
+};
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  try {
+    const token = await getToken({ req: context.req });
+    if (!token) {
+      throw new Error("No token found");
+    }
+    const sameGradeUsers = await getSameGradeUsers(token);
+    return { props: { data: sameGradeUsers } };
+  } catch (error) {
+    console.error("Could not fetch data from 42 API\n", error);
+    const statusText = error instanceof Error ? error.message : "Unknown error";
+    return { props: { statusText } };
+  }
+};
+
+const countUserByLevel = (users: CursusUser[]) => {
+  const userCountByLevel: number[] = [];
+  users.forEach((user) => {
+    if (userCountByLevel[Math.floor(user.level)]) {
+      userCountByLevel[Math.floor(user.level)]++;
+    } else {
+      userCountByLevel[Math.floor(user.level)] = 1;
+    }
+  });
+  return userCountByLevel;
+};
+
+const SameGrade = ({ data, statusText }: Props) => {
+  if (statusText || !data) {
+    return <p>{statusText ?? "Empty Data"}</p>;
+  }
+  const userCountByLevel = countUserByLevel(data);
   return (
     <Layout>
       <Heading>Same Grade</Heading>
-      <LineChartSample />
-      <p>{JSON.stringify(data)}</p>
+      <UserCountBarChartByLevel userCountByLevel={userCountByLevel} />
     </Layout>
   );
 };
