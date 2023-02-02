@@ -15,6 +15,14 @@ type ReviewInfo = {
   comment: string;
 };
 
+type Token = {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+  scope: string;
+  created_at: number;
+};
+
 // 42APIのアクセストークンを取得
 const getAccessToken = async () => {
   const headersList = {
@@ -38,7 +46,7 @@ const getAccessToken = async () => {
 };
 
 // review-commentsを取得
-const getReviewInfo = async (token: any) => {
+const getReviewInfo = async (token: Token) => {
   const headersList = {
     Accept: "*/*",
     "Content-Type": "application/x-www-form-urlencoded",
