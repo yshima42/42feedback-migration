@@ -3,6 +3,7 @@ import { Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import axios from "axios";
+import { Token } from "types/token";
 
 const PROJECT_ID = 1331;
 
@@ -13,15 +14,6 @@ type ProjectReview = {
   };
   final_mark: number;
   comment: string;
-};
-
-// 42APIのアクセストークンの型外に出す
-type Token = {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  scope: string;
-  created_at: number;
 };
 
 // 42APIのアクセストークンを取得
@@ -46,7 +38,6 @@ const fetchAccessToken = async () => {
   return token;
 };
 
-// review-commentsを取得
 const fetchProjectReviews = async (token: Token) => {
   const headersList = {
     Authorization: "Bearer " + token?.access_token,
