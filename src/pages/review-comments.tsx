@@ -32,8 +32,6 @@ export const getStaticProps: GetStaticProps = async () => {
   });
   const token = await res.json();
 
-  console.log(data);
-
   // TODO: axiosを使う
   if (token) {
     const res = await fetch(
