@@ -25,7 +25,7 @@ type Token = {
 };
 
 // 42APIのアクセストークンを取得
-const getAccessToken = async () => {
+const fetchAccessToken = async () => {
   const headersList = {
     Accept: "*/*",
     "Content-Type": "application/x-www-form-urlencoded",
@@ -47,7 +47,7 @@ const getAccessToken = async () => {
 };
 
 // review-commentsを取得
-const getReviewInfo = async (token: Token) => {
+const fetchProjectReviews = async (token: Token) => {
   const headersList = {
     Authorization: "Bearer " + token?.access_token,
   };
@@ -79,7 +79,7 @@ const getReviewInfo = async (token: Token) => {
 export const getStaticProps: GetStaticProps = async () => {
   let token: Token;
   try {
-    token = await getAccessToken();
+    token = await fetchAccessToken();
   } catch (error) {
     return {
       props: {
@@ -90,7 +90,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   let projectReviews: ProjectReview[] = [];
   try {
-    projectReviews = await getReviewInfo(token);
+    projectReviews = await fetchProjectReviews(token);
   } catch (error) {
     return {
       props: {
