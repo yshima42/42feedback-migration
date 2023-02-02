@@ -59,9 +59,18 @@ const getReviewInfo = async (token: Token) => {
   };
 
   const response = await axios.request(reqOptions);
-  const projectReview: ProjectReview[] = response.data;
+  const projectReviews: ProjectReview[] = response.data;
 
-  return projectReview;
+  // projectReview.forEach((value: ProjectReview) => {
+  //   console.log(value["id"]);
+  //   console.log(value["corrector"]["login"]);
+  //   console.log(value["final_mark"]);
+  //   console.log(value["comment"]);
+  // });
+
+  // console.log(projectReview);
+
+  return projectReviews;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
