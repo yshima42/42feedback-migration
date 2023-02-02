@@ -2,8 +2,7 @@ import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
 // import { getToken } from "next-auth/jwt";
 import { GetStaticProps } from "next";
-import { Feedbacks } from "@/type/type";
-import Link from "next/link";
+import { Feedbacks } from "utils/type";
 
 const PROJECT_ID = 1331;
 const CURSUS_ID = 21;
