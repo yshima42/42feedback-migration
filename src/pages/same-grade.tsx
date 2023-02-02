@@ -4,39 +4,41 @@ import { Heading } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getToken, JWT } from "next-auth/jwt";
 import { CursusUser } from "next-auth/providers/42-school";
-import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
+import {
+  API_URL,
+  CAMPUS_ID_PARIS,
+  CAMPUS_ID_SEOUL,
+  CAMPUS_ID_TOKYO,
+  CURSUS_ID,
+} from "utils/constants";
 
 type Props = {
-  data?: CursusUser[];
+  data?: CursusUser[][];
   statusText?: string;
 };
 
-// ログインユーザーの入学日を取得
-const getLoginUserAdmissionDate = async (token: JWT) => {
-  const userId = token?.sub;
-  const res = await fetch(
-    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[user_id]=${userId}`,
-    {
-      headers: {
-        Authorization: "Bearer " + token?.accessToken,
-      },
-    }
-  );
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
-  const loginUser: CursusUser[] = await res.json();
-  return loginUser[0].begin_at;
-};
+enum AddmissionDate {
+  Tokyo = "2021-07-06T04:00:00.000Z",
+  Seoul = "2021-05-03T00:42:00.000Z",
+  Paris = "2021-05-20T07:42:00.000Z",
+}
 
-// ログインユーザーと同じ日に入学したユーザーを取得
-const getSameGradeUsers = async (token: JWT) => {
-  const loginUserAdmissionDate = await getLoginUserAdmissionDate(token);
+enum Campus {
+  Tokyo,
+  Seoul,
+  Paris,
+}
+
+const fetchCursusUsersByCumpusIdAndBeginAt = async (
+  campusId: number,
+  beginAt: string,
+  accessToken: string
+) => {
   const res = await fetch(
-    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}&filter[begin_at]=${loginUserAdmissionDate}&page[size]=100`,
+    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}&page[size]=100`,
     {
       headers: {
-        Authorization: "Bearer " + token?.accessToken,
+        Authorization: "Bearer " + accessToken,
       },
     }
   );
@@ -55,7 +57,26 @@ export const getServerSideProps: GetServerSideProps = async (
     if (!token) {
       throw new Error("No token found");
     }
-    const sameGradeUsers = await getSameGradeUsers(token);
+    const sameGradeUsers: CursusUser[][] = [];
+
+    sameGradeUsers[Campus.Tokyo] = await fetchCursusUsersByCumpusIdAndBeginAt(
+      CAMPUS_ID_TOKYO,
+      AddmissionDate.Tokyo,
+      token.accessToken
+    );
+
+    sameGradeUsers[Campus.Seoul] = await fetchCursusUsersByCumpusIdAndBeginAt(
+      CAMPUS_ID_SEOUL,
+      AddmissionDate.Seoul,
+      token.accessToken
+    );
+
+    sameGradeUsers[Campus.Paris] = await fetchCursusUsersByCumpusIdAndBeginAt(
+      CAMPUS_ID_PARIS,
+      AddmissionDate.Paris,
+      token.accessToken
+    );
+
     return { props: { data: sameGradeUsers } };
   } catch (error) {
     console.error("Could not fetch data from 42 API\n", error);
@@ -80,7 +101,10 @@ const SameGrade = ({ data, statusText }: Props) => {
   if (statusText || !data) {
     return <p>{statusText ?? "Empty Data"}</p>;
   }
-  const userCountByLevel = countUserByLevel(data);
+  const userCountByLevel: number[][] = [];
+  userCountByLevel[Campus.Tokyo] = countUserByLevel(data[Campus.Tokyo]);
+  userCountByLevel[Campus.Seoul] = countUserByLevel(data[Campus.Seoul]);
+  userCountByLevel[Campus.Paris] = countUserByLevel(data[Campus.Paris]);
   return (
     <Layout>
       <Heading>Same Grade</Heading>
