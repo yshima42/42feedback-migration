@@ -1,9 +1,8 @@
 import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
-// import { getToken } from "next-auth/jwt";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
-import { ScaleTeam } from "types/scaleTeam";
+import axios from "axios";
 
 const PROJECT_ID = 1331;
 
@@ -20,35 +19,41 @@ export const getStaticProps: GetStaticProps = async () => {
   let data: ReviewInfo[] = [];
 
   // 42APIのアクセストークンを取得
-  // TODO: axiosを使う
+  const headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
 
-  const res = await fetch(`${API_URL}/oauth/token`, {
+  const bodyContent = `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`;
+
+  const reqOptions = {
+    url: `${API_URL}/oauth/token`,
     method: "POST",
-    headers: {
-      Accept: "*/*",
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
-  });
-  const token = await res.json();
+    headers: headersList,
+    data: bodyContent,
+  };
 
-  console.log(data);
+  const response = await axios.request(reqOptions);
+  console.log(response.data);
+  const token = response.data;
 
   // TODO: axiosを使う
   if (token) {
-    const res = await fetch(
-      `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?
-      &page[size]=100
-      &page[number]=1
-      &filter[cursus_id]=${CURSUS_ID}
-      &filter[campus_id]=${CAMPUS_ID}`,
-      {
-        headers: {
-          Authorization: "Bearer " + token?.access_token,
-        },
-      }
-    );
-    data = await res.json();
+    const headersList = {
+      Accept: "*/*",
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: "Bearer " + token?.access_token,
+    };
+
+    const reqOptions = {
+      url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
+      method: "GET",
+      headers: headersList,
+    };
+
+    const response = await axios.request(reqOptions);
+    console.log(response.data);
+    data = response.data;
   } else {
     console.log("no token");
   }
