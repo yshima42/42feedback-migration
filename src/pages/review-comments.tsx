@@ -12,13 +12,14 @@ export const getStaticProps: GetStaticProps = async () => {
   let data: Feedbacks[] = [];
 
   // TODO: axiosを使う
-  const token = await fetch("https://api.intra.42.fr/oauth/token", {
+  const res = await fetch("https://api.intra.42.fr/oauth/token", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
-  }).then((res) => res.json());
+  });
+  const token = await res.json();
 
   // TODO: axiosを使う
   // TODO: エラーハンドリング
