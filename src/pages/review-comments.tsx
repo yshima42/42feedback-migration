@@ -2,17 +2,17 @@ import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
 // import { getToken } from "next-auth/jwt";
 import { GetStaticProps } from "next";
-import { Feedbacks } from "utils/type";
+import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
+import { Feedbacks } from "utils/types";
 
 const PROJECT_ID = 1331;
-const CURSUS_ID = 21;
-const CAMPUS_ID = 26;
 
 export const getStaticProps: GetStaticProps = async () => {
   let data: Feedbacks[] = [];
 
+  // 42APIのアクセストークンを取得
   // TODO: axiosを使う
-  const res = await fetch("https://api.intra.42.fr/oauth/token", {
+  const res = await fetch(`${API_URL}/oauth/token`, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -22,11 +22,10 @@ export const getStaticProps: GetStaticProps = async () => {
   const token = await res.json();
 
   // TODO: axiosを使う
-  // TODO: エラーハンドリング
   if (token) {
     const res = await fetch(
-      `https://api.intra.42.fr/v2/projects/${PROJECT_ID}/scale_teams?
-      &page[size]=10
+      `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?
+      &page[size]=100
       &page[number]=1
       &filter[cursus_id]=${CURSUS_ID}
       &filter[campus_id]=${CAMPUS_ID}`,
