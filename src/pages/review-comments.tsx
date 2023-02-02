@@ -7,19 +7,27 @@ import { ScaleTeam } from "types/scaleTeam";
 
 const PROJECT_ID = 1331;
 
+type ReviewInfo = {
+  id: number;
+  corrector: {
+    login: string;
+  };
+  final_mark: number;
+  comment: string;
+};
+
 export const getStaticProps: GetStaticProps = async () => {
-  let data: ScaleTeam[] = [];
+  let data: ReviewInfo[] = [];
 
   // 42APIのアクセストークンを取得
   // TODO: axiosを使う
   const res = await fetch(`${API_URL}/oauth/token`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
     body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
   });
+  console.log("res.body: ", res.body);
   const token = await res.json();
+  console.log("token:", token);
 
   // TODO: axiosを使う
   if (token) {
@@ -49,7 +57,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 type Props = {
-  data: ScaleTeam[];
+  data: ReviewInfo[];
 };
 
 const ReviewComments = (props: Props) => {
@@ -59,7 +67,7 @@ const ReviewComments = (props: Props) => {
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {data.map((value: ScaleTeam) => (
+        {data.map((value: ReviewInfo) => (
           <div key={value["id"]}>
             {value["corrector"]["login"]}
             <br />
