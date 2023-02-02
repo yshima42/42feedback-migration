@@ -61,12 +61,7 @@ const ReviewComments = (props: Props) => {
       <div>
         {data.map((value: Feedbacks) => (
           <div key={value["id"]}>
-            reviewer:{" "}
-            <Link
-              href={`https://profile.intra.42.fr/users/${value["corrector"]["login"]}`}
-            >
-              {value["corrector"]["login"]}
-            </Link>
+            {value["corrector"]["login"]}
             <br />
             final_mark: {value["final_mark"]}
             <br />
