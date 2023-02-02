@@ -15,10 +15,8 @@ type ReviewInfo = {
   comment: string;
 };
 
-export const getStaticProps: GetStaticProps = async () => {
-  let data: ReviewInfo[] = [];
-
-  // 42APIのアクセストークンを取得
+// 42APIのアクセストークンを取得
+const getAccessToken = async () => {
   const headersList = {
     Accept: "*/*",
     "Content-Type": "application/x-www-form-urlencoded",
@@ -34,50 +32,55 @@ export const getStaticProps: GetStaticProps = async () => {
   };
 
   const response = await axios.request(reqOptions);
-  console.log(response.data);
   const token = response.data;
 
-  // TODO: axiosを使う
-  if (token) {
-    const headersList = {
-      Accept: "*/*",
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: "Bearer " + token?.access_token,
-    };
+  return token;
+};
 
-    const reqOptions = {
-      url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
-      method: "GET",
-      headers: headersList,
-    };
+// review-commentsを取得
+const getReviewInfo = async (token: any) => {
+  const headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/x-www-form-urlencoded",
+    Authorization: "Bearer " + token?.access_token,
+  };
 
-    const response = await axios.request(reqOptions);
-    console.log(response.data);
-    data = response.data;
-  } else {
-    console.log("no token");
-  }
+  const reqOptions = {
+    url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
+    method: "GET",
+    headers: headersList,
+  };
+
+  const response = await axios.request(reqOptions);
+  const reviewInfo = response.data;
+
+  return reviewInfo;
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+  const token = await getAccessToken();
+  const reviewInfo: ReviewInfo[] = await getReviewInfo(token);
 
   return {
     props: {
-      data,
+      reviewInfo,
     },
     revalidate: 10,
   };
 };
 
 type Props = {
-  data: ReviewInfo[];
+  reviewInfo: ReviewInfo[];
 };
 
 const ReviewComments = (props: Props) => {
-  const { data } = props;
+  const { reviewInfo } = props;
 
   return (
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {data.map((value: ReviewInfo) => (
+        {reviewInfo.map((value: ReviewInfo) => (
           <div key={value["id"]}>
             {value["corrector"]["login"]}
             <br />
