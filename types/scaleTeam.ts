@@ -1,4 +1,4 @@
-export type Feedbacks = {
+export type ScaleTeam = {
   id: number;
   scale_id: number;
   comment: string;

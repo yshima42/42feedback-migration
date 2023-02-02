@@ -3,12 +3,12 @@ import { Heading } from "@chakra-ui/react";
 // import { getToken } from "next-auth/jwt";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
-import { Feedbacks } from "utils/types";
+import { ScaleTeam } from "types/scaleTeam";
 
 const PROJECT_ID = 1331;
 
 export const getStaticProps: GetStaticProps = async () => {
-  let data: Feedbacks[] = [];
+  let data: ScaleTeam[] = [];
 
   // 42APIのアクセストークンを取得
   // TODO: axiosを使う
@@ -49,7 +49,7 @@ export const getStaticProps: GetStaticProps = async () => {
 };
 
 type Props = {
-  data: Feedbacks[];
+  data: ScaleTeam[];
 };
 
 const ReviewComments = (props: Props) => {
@@ -59,7 +59,7 @@ const ReviewComments = (props: Props) => {
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {data.map((value: Feedbacks) => (
+        {data.map((value: ScaleTeam) => (
           <div key={value["id"]}>
             {value["corrector"]["login"]}
             <br />
