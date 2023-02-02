@@ -59,7 +59,7 @@ const fetchProjectReviews = async (token: Token) => {
   };
 
   const reqOptions = {
-    url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
+    url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=10&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
     method: "GET",
     headers: headersList,
   };
