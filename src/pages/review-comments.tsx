@@ -48,8 +48,6 @@ const getAccessToken = async () => {
 // review-commentsを取得
 const getReviewInfo = async (token: Token) => {
   const headersList = {
-    Accept: "*/*",
-    "Content-Type": "application/x-www-form-urlencoded",
     Authorization: "Bearer " + token?.access_token,
   };
 
