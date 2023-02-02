@@ -10,7 +10,9 @@ const CURSUS_ID = 21;
 const CAMPUS_ID = 26;
 
 export const getStaticProps: GetStaticProps = async () => {
-  // const token = await getToken({ req: context.req });
+  let data: Feedbacks[] = [];
+
+  // TODO: axiosを使う
   const token = await fetch("https://api.intra.42.fr/oauth/token", {
     method: "POST",
     headers: {
@@ -18,14 +20,13 @@ export const getStaticProps: GetStaticProps = async () => {
     },
     body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
   }).then((res) => res.json());
-  console.log(token);
 
-  let data: Feedbacks[] = [];
-
+  // TODO: axiosを使う
+  // TODO: エラーハンドリング
   if (token) {
     const res = await fetch(
       `https://api.intra.42.fr/v2/projects/${PROJECT_ID}/scale_teams?
-      &page[size]=100
+      &page[size]=10
       &page[number]=1
       &filter[cursus_id]=${CURSUS_ID}
       &filter[campus_id]=${CAMPUS_ID}`,
@@ -44,7 +45,7 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       data,
     },
-    revalidate: 10,
+    revalidate: 10000,
   };
 };
 
