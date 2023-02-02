@@ -65,6 +65,12 @@ type Token = {
 
 export const getStaticProps: GetStaticProps = async () => {
   // const token = await getAccessToken();
+  // const projectReviews: ProjectReview[] = await getReviewInfo(token);
+  let projectReviews: ProjectReview[] = [];
+
+  // 42APIのアクセストークンを取得
+  // TODO: axiosを使う
+
   const res = await fetch(`${API_URL}/oauth/token`, {
     method: "POST",
     headers: {
@@ -75,9 +81,9 @@ export const getStaticProps: GetStaticProps = async () => {
   });
   const token = await res.json();
 
-  // const projectReviews: ProjectReview[] = await getReviewInfo(token);
-  let projectReviews: ProjectReview[] = [];
+  console.log(projectReviews);
 
+  // TODO: axiosを使う
   if (token) {
     const res = await fetch(
       `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?
