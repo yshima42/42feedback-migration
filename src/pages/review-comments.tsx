@@ -6,7 +6,7 @@ import axios from "axios";
 
 const PROJECT_ID = 1331;
 
-type ReviewInfo = {
+type ProjectReview = {
   id: number;
   corrector: {
     login: string;
@@ -60,35 +60,35 @@ const getReviewInfo = async (token: Token) => {
   };
 
   const response = await axios.request(reqOptions);
-  const reviewInfo = response.data;
+  const projectReview = response.data;
 
-  return reviewInfo;
+  return projectReview;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
   const token = await getAccessToken();
-  const reviewInfo: ReviewInfo[] = await getReviewInfo(token);
+  const projectReviews: ProjectReview[] = await getReviewInfo(token);
 
   return {
     props: {
-      reviewInfo,
+      projectReviews,
     },
     revalidate: 10,
   };
 };
 
 type Props = {
-  reviewInfo: ReviewInfo[];
+  projectReviews: ProjectReview[];
 };
 
 const ReviewComments = (props: Props) => {
-  const { reviewInfo } = props;
+  const { projectReviews } = props;
 
   return (
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {reviewInfo.map((value: ReviewInfo) => (
+        {projectReviews.map((value: ProjectReview) => (
           <div key={value["id"]}>
             {value["corrector"]["login"]}
             <br />
