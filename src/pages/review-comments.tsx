@@ -21,13 +21,18 @@ export const getStaticProps: GetStaticProps = async () => {
 
   // 42APIのアクセストークンを取得
   // TODO: axiosを使う
+
   const res = await fetch(`${API_URL}/oauth/token`, {
     method: "POST",
+    headers: {
+      Accept: "*/*",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
     body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
   });
-  console.log("res.body: ", res.body);
   const token = await res.json();
-  console.log("token:", token);
+
+  console.log(data);
 
   // TODO: axiosを使う
   if (token) {
