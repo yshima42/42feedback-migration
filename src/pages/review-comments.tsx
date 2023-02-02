@@ -1,37 +1,49 @@
 import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
-import { getToken } from "next-auth/jwt";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+// import { getToken } from "next-auth/jwt";
+import { GetStaticProps } from "next";
+import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
+import { ScaleTeam } from "types/scaleTeam";
 
 const PROJECT_ID = 1331;
-const CURSUS_ID = 21;
-const CAMPUS_ID = 26;
-const MIN_VALUE = 0;
-const MAX_VALUE = 99;
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const token = await getToken({ req: context.req });
-  let data = {};
+type ReviewInfo = {
+  id: number;
+  corrector: {
+    login: string;
+  };
+  final_mark: number;
+  comment: string;
+};
 
+export const getStaticProps: GetStaticProps = async () => {
+  let data: ReviewInfo[] = [];
+
+  // 42APIのアクセストークンを取得
+  // TODO: axiosを使う
+  const res = await fetch(`${API_URL}/oauth/token`, {
+    method: "POST",
+    body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
+  });
+  console.log("res.body: ", res.body);
+  const token = await res.json();
+  console.log("token:", token);
+
+  // TODO: axiosを使う
   if (token) {
-    // console.log("token: ", token.accessToken);
     const res = await fetch(
-      `https://api.intra.42.fr/v2/projects/${PROJECT_ID}/scale_teams?
-      page[size]=100
+      `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?
+      &page[size]=100
+      &page[number]=1
       &filter[cursus_id]=${CURSUS_ID}
-      &filter[campus_id]=${CAMPUS_ID}
-      &range[final_mark]=${MIN_VALUE},${MAX_VALUE}`,
+      &filter[campus_id]=${CAMPUS_ID}`,
       {
         headers: {
-          Authorization: "Bearer " + token?.accessToken,
+          Authorization: "Bearer " + token?.access_token,
         },
       }
     );
-
     data = await res.json();
-    console.log(data);
   } else {
     console.log("no token");
   }
@@ -40,18 +52,25 @@ export const getServerSideProps: GetServerSideProps = async (
     props: {
       data,
     },
+    revalidate: 10,
   };
 };
 
-const ReviewComments = (props: { data: any }) => {
+type Props = {
+  data: ReviewInfo[];
+};
+
+const ReviewComments = (props: Props) => {
   const { data } = props;
 
   return (
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {data.map((value: any) => (
+        {data.map((value: ReviewInfo) => (
           <div key={value["id"]}>
+            {value["corrector"]["login"]}
+            <br />
             final_mark: {value["final_mark"]}
             <br />
             comment: {value["comment"]}
