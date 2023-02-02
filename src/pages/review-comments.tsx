@@ -1,7 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
-import { getToken } from "next-auth/jwt";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+// import { getToken } from "next-auth/jwt";
+import { GetStaticProps } from "next";
 import { Feedbacks } from "@/type/type";
 import Link from "next/link";
 
@@ -9,10 +9,17 @@ const PROJECT_ID = 1331;
 const CURSUS_ID = 21;
 const CAMPUS_ID = 26;
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const token = await getToken({ req: context.req });
+export const getStaticProps: GetStaticProps = async () => {
+  // const token = await getToken({ req: context.req });
+  const token = await fetch("https://api.intra.42.fr/oauth/token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`,
+  }).then((res) => res.json());
+  console.log(token);
+
   let data: Feedbacks[] = [];
 
   if (token) {
@@ -24,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (
       &filter[campus_id]=${CAMPUS_ID}`,
       {
         headers: {
-          Authorization: "Bearer " + token?.accessToken,
+          Authorization: "Bearer " + token?.access_token,
         },
       }
     );
@@ -37,6 +44,7 @@ export const getServerSideProps: GetServerSideProps = async (
     props: {
       data,
     },
+    revalidate: 10,
   };
 };
 
