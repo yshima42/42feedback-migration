@@ -79,7 +79,7 @@ export const getStaticProps: GetStaticProps = async () => {
 
   let projectReviews: ProjectReview[] = [];
   try {
-    const projectReviews: ProjectReview[] = await getReviewInfo(token);
+    projectReviews = await getReviewInfo(token);
   } catch (error) {
     return {
       props: {
