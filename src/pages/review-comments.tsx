@@ -46,22 +46,22 @@ type Token = {
 // };
 
 // review-commentsを取得
-const getReviewInfo = async (token: Token) => {
-  const headersList = {
-    Authorization: "Bearer " + token?.access_token,
-  };
+// const getReviewInfo = async (token: Token) => {
+//   const headersList = {
+//     Authorization: "Bearer " + token?.access_token,
+//   };
 
-  const reqOptions = {
-    url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
-    method: "GET",
-    headers: headersList,
-  };
+//   const reqOptions = {
+//     url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
+//     method: "GET",
+//     headers: headersList,
+//   };
 
-  const response = await axios.request(reqOptions);
-  const projectReview = response.data;
+//   const response = await axios.request(reqOptions);
+//   const projectReview = response.data;
 
-  return projectReview;
-};
+//   return projectReview;
+// };
 
 export const getStaticProps: GetStaticProps = async () => {
   // const token = await getAccessToken();
@@ -75,7 +75,26 @@ export const getStaticProps: GetStaticProps = async () => {
   });
   const token = await res.json();
 
-  const projectReviews: ProjectReview[] = await getReviewInfo(token);
+  // const projectReviews: ProjectReview[] = await getReviewInfo(token);
+  let projectReviews: ProjectReview[] = [];
+
+  if (token) {
+    const res = await fetch(
+      `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?
+      &page[size]=100
+      &page[number]=1
+      &filter[cursus_id]=${CURSUS_ID}
+      &filter[campus_id]=${CAMPUS_ID}`,
+      {
+        headers: {
+          Authorization: "Bearer " + token?.access_token,
+        },
+      }
+    );
+    projectReviews = await res.json();
+  } else {
+    console.log("no token");
+  }
 
   return {
     props: {
