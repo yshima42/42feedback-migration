@@ -32,6 +32,7 @@ const fetchAccessToken = async () => {
     data: bodyContent,
   };
 
+  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
   const response = await axios.request(reqOptions);
   const token = response.data;
 
@@ -49,7 +50,24 @@ const fetchProjectReviews = async (token: Token) => {
     headers: headersList,
   };
 
+  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
   const response = await axios.request(reqOptions);
+
+  const numberOfContents = response.headers["x-total"];
+  const numberOfPages = Math.ceil(numberOfContents / 100);
+
+  for (let i = 2; i <= numberOfPages; i++) {
+    const reqOptions = {
+      url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=${i}&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
+      method: "GET",
+      headers: headersList,
+    };
+
+    const res = await axios.request(reqOptions);
+    res.data.forEach((value: ProjectReview) => {
+      response.data.push(value);
+    });
+  }
 
   const projectReviews: ProjectReview[] = response.data.map(
     (value: ProjectReview) => {
@@ -72,9 +90,11 @@ export const getStaticProps: GetStaticProps = async () => {
   try {
     token = await fetchAccessToken();
   } catch (error) {
+    const errorMessage = "アクセストークンの取得に失敗しました";
+    console.log(errorMessage);
     return {
       props: {
-        error: "アクセストークンの取得に失敗しました",
+        error: errorMessage,
       },
     };
   }
@@ -83,9 +103,11 @@ export const getStaticProps: GetStaticProps = async () => {
   try {
     projectReviews = await fetchProjectReviews(token);
   } catch (error) {
+    const errorMessage = "review-commentsの取得に失敗しました";
+    console.log(errorMessage);
     return {
       props: {
-        error: "review-commentsの取得に失敗しました",
+        error: errorMessage,
       },
     };
   }
