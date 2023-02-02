@@ -15,6 +15,7 @@ type ProjectReview = {
   comment: string;
 };
 
+// 42APIのアクセストークンの型外に出す
 type Token = {
   access_token: string;
   token_type: string;
@@ -24,7 +25,7 @@ type Token = {
 };
 
 // 42APIのアクセストークンを取得
-const getAccessToken = async () => {
+const fetchAccessToken = async () => {
   const headersList = {
     Accept: "*/*",
     "Content-Type": "application/x-www-form-urlencoded",
@@ -39,14 +40,20 @@ const getAccessToken = async () => {
     data: bodyContent,
   };
 
-  const response = await axios.request(reqOptions);
+  let response;
+  try {
+    response = await axios.request(reqOptions);
+  } catch {
+    throw new Error("アクセストークンの取得に失敗しました");
+  }
+
   const token = response.data;
 
   return token;
 };
 
 // review-commentsを取得
-const getReviewInfo = async (token: Token) => {
+const fetchProjectReviews = async (token: Token) => {
   const headersList = {
     Authorization: "Bearer " + token?.access_token,
   };
@@ -57,33 +64,28 @@ const getReviewInfo = async (token: Token) => {
     headers: headersList,
   };
 
-  const response = await axios.request(reqOptions);
-  const projectReview: ProjectReview[] = response.data;
-  console.log(projectReview);
+  let response;
+  try {
+    response = await axios.request(reqOptions);
+  } catch {
+    throw new Error("review-commentsの取得に失敗しました");
+  }
 
-  return projectReview;
+  const projectReviews: ProjectReview[] = response.data;
+
+  return projectReviews;
 };
 
 export const getStaticProps: GetStaticProps = async () => {
   let token: Token;
-
-  try {
-    token = await getAccessToken();
-  } catch (error) {
-    return {
-      props: {
-        error: "アクセストークンの取得に失敗しました",
-      },
-    };
-  }
-
   let projectReviews: ProjectReview[] = [];
   try {
-    projectReviews = await getReviewInfo(token);
+    token = await fetchAccessToken();
+    projectReviews = await fetchProjectReviews(token);
   } catch (error) {
     return {
       props: {
-        error: "review-commentsの取得に失敗しました",
+        error,
       },
     };
   }
