@@ -1,12 +1,13 @@
 import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
+// import { getToken } from "next-auth/jwt";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
-import axios from "axios";
+import { ScaleTeam } from "types/scaleTeam";
 
 const PROJECT_ID = 1331;
 
-type ProjectReview = {
+type ReviewInfo = {
   id: number;
   corrector: {
     login: string;
@@ -15,58 +16,8 @@ type ProjectReview = {
   comment: string;
 };
 
-type Token = {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  scope: string;
-  created_at: number;
-};
-
-// 42APIのアクセストークンを取得
-// const getAccessToken = async () => {
-//   const headersList = {
-//     Accept: "*/*",
-//     "Content-Type": "application/x-www-form-urlencoded",
-//   };
-
-//   const bodyContent = `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`;
-
-//   const reqOptions = {
-//     url: `${API_URL}/oauth/token`,
-//     method: "POST",
-//     headers: headersList,
-//     data: bodyContent,
-//   };
-
-//   const response = await axios.request(reqOptions);
-//   const token = response.data;
-
-//   return token;
-// };
-
-// review-commentsを取得
-// const getReviewInfo = async (token: Token) => {
-//   const headersList = {
-//     Authorization: "Bearer " + token?.access_token,
-//   };
-
-//   const reqOptions = {
-//     url: `${API_URL}/v2/projects/${PROJECT_ID}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
-//     method: "GET",
-//     headers: headersList,
-//   };
-
-//   const response = await axios.request(reqOptions);
-//   const projectReview = response.data;
-
-//   return projectReview;
-// };
-
 export const getStaticProps: GetStaticProps = async () => {
-  // const token = await getAccessToken();
-  // const projectReviews: ProjectReview[] = await getReviewInfo(token);
-  let projectReviews: ProjectReview[] = [];
+  let data: ReviewInfo[] = [];
 
   // 42APIのアクセストークンを取得
   // TODO: axiosを使う
@@ -81,7 +32,7 @@ export const getStaticProps: GetStaticProps = async () => {
   });
   const token = await res.json();
 
-  console.log(projectReviews);
+  console.log(data);
 
   // TODO: axiosを使う
   if (token) {
@@ -97,31 +48,31 @@ export const getStaticProps: GetStaticProps = async () => {
         },
       }
     );
-    projectReviews = await res.json();
+    data = await res.json();
   } else {
     console.log("no token");
   }
 
   return {
     props: {
-      projectReviews,
+      data,
     },
     revalidate: 10,
   };
 };
 
 type Props = {
-  projectReviews: ProjectReview[];
+  data: ReviewInfo[];
 };
 
 const ReviewComments = (props: Props) => {
-  const { projectReviews } = props;
+  const { data } = props;
 
   return (
     <Layout>
       <Heading>review-comments</Heading>
       <div>
-        {projectReviews.map((value: ProjectReview) => (
+        {data.map((value: ReviewInfo) => (
           <div key={value["id"]}>
             {value["corrector"]["login"]}
             <br />
