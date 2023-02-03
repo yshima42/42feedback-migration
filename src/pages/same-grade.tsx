@@ -68,7 +68,7 @@ const barChartInfo: BarChartInfo[] = [
   },
 ];
 
-const fetchCursusUsersByCumpusIdAndBeginAt = async (
+const fetchCursusUsersByCampusIdAndBeginAt = async (
   campusId: number,
   beginAt: string,
   accessToken: string
@@ -104,7 +104,7 @@ export const getServerSideProps: GetServerSideProps = async (
     }
 
     for (const value of barChartInfo) {
-      const users = await fetchCursusUsersByCumpusIdAndBeginAt(
+      const users = await fetchCursusUsersByCampusIdAndBeginAt(
         value.usersInfo.campusId,
         value.usersInfo.beginAt,
         token.accessToken
