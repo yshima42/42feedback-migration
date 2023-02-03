@@ -12,13 +12,19 @@ import {
 
 type Props = {
   userCountByLevel: number[];
+  xAxisLabel: string;
+  barColor: string;
 };
 
-export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
+export const UserCountBarChartByLevel = ({
+  userCountByLevel,
+  xAxisLabel,
+  barColor,
+}: Props) => {
   const data = userCountByLevel.map((count: number, index) => {
     return {
       level: `${index}`,
-      "Number of students": count,
+      [xAxisLabel]: count,
     };
   });
 
@@ -48,7 +54,7 @@ export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
       </YAxis>
       <Tooltip />
       <Legend />
-      <Bar dataKey="Number of students" fill="#82ca9d" />
+      <Bar dataKey={xAxisLabel} fill={barColor} />
     </BarChart>
   );
 };
