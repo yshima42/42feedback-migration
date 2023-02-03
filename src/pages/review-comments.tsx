@@ -4,6 +4,7 @@ import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import axios from "axios";
 import { Token } from "types/token";
+import Head from "next/head";
 
 const PROJECT_ID = 1331;
 
@@ -63,8 +64,8 @@ const fetchProjectReviews = async (token: Token) => {
       headers: headersList,
     };
 
-    const res = await axios.request(reqOptions);
-    res.data.forEach((value: ProjectReview) => {
+    const responsesFromSecondPage = await axios.request(reqOptions);
+    responsesFromSecondPage.data.forEach((value: ProjectReview) => {
       response.data.push(value);
     });
   }
@@ -132,6 +133,9 @@ const ReviewComments = (props: Props) => {
 
   return (
     <Layout>
+      <Head>
+        <meta name="robots" content="noindex,nofollow" />
+      </Head>
       <Heading>review-comments</Heading>
       <div>
         {projectReviews.map((value: ProjectReview) => (
