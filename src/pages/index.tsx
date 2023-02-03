@@ -13,6 +13,8 @@ const Home = () => {
       <Link href="/same-grade">same grade progress(名前ダサいから変える)</Link>
       <br />
       <Link href="/review-comments">review comments</Link>
+      <br />
+      <Link href="/review-comments-csr">review comments csr</Link>
     </Layout>
   );
 };
