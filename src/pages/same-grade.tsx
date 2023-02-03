@@ -13,21 +13,59 @@ import {
 } from "utils/constants";
 
 type Props = {
-  data?: CursusUser[][];
+  data?: BarChartInfo[];
   statusText?: string;
 };
 
-enum AddmissionDate {
-  Tokyo = "2021-07-06T04:00:00.000Z",
-  Seoul = "2021-05-03T00:42:00.000Z",
-  Paris = "2021-05-20T07:42:00.000Z",
-}
+type UsersInfo = {
+  campusId: number;
+  beginAt: string;
+  users?: CursusUser[];
+  userCountByLebel?: number[];
+};
 
-enum Campus {
-  Tokyo,
-  Seoul,
-  Paris,
-}
+type DisplayInfo = {
+  xAxisLabel: string;
+  barColor: string;
+};
+
+type BarChartInfo = {
+  usersInfo: UsersInfo;
+  displayInfo: DisplayInfo;
+};
+
+const barChartInfo: BarChartInfo[] = [
+  {
+    usersInfo: {
+      campusId: CAMPUS_ID_TOKYO,
+      beginAt: "2021-07-06T04:00:00.000Z",
+    },
+    displayInfo: {
+      xAxisLabel: "42Tokyo 2021-07-06",
+      barColor: "#FF6384",
+    },
+  },
+  {
+    usersInfo: {
+      campusId: CAMPUS_ID_SEOUL,
+      beginAt: "2021-05-03T00:42:00.000Z",
+    },
+    displayInfo: {
+      xAxisLabel: "42Seoul 2021-05-03",
+      barColor: "#36A2EB",
+    },
+  },
+  {
+    usersInfo: {
+      campusId: CAMPUS_ID_PARIS,
+      beginAt: "2021-05-20T07:42:00.000Z",
+    },
+    displayInfo: {
+      xAxisLabel: "42Paris 2021-05-20",
+      barColor: "#FFCE56",
+    },
+  },
+];
 
 const fetchCursusUsersByCumpusIdAndBeginAt = async (
   campusId: number,
@@ -45,44 +83,8 @@ const fetchCursusUsersByCumpusIdAndBeginAt = async (
   if (!res.ok) {
     throw new Error(res.statusText);
   }
-  const sameGradeUsers: CursusUser[] = await res.json();
-  return sameGradeUsers;
-};
-
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  try {
-    const token = await getToken({ req: context.req });
-    if (!token) {
-      throw new Error("No token found");
-    }
-    const sameGradeUsers: CursusUser[][] = [];
-
-    sameGradeUsers[Campus.Tokyo] = await fetchCursusUsersByCumpusIdAndBeginAt(
-      CAMPUS_ID_TOKYO,
-      AddmissionDate.Tokyo,
-      token.accessToken
-    );
-
-    sameGradeUsers[Campus.Seoul] = await fetchCursusUsersByCumpusIdAndBeginAt(
-      CAMPUS_ID_SEOUL,
-      AddmissionDate.Seoul,
-      token.accessToken
-    );
-
-    sameGradeUsers[Campus.Paris] = await fetchCursusUsersByCumpusIdAndBeginAt(
-      CAMPUS_ID_PARIS,
-      AddmissionDate.Paris,
-      token.accessToken
-    );
-
-    return { props: { data: sameGradeUsers } };
-  } catch (error) {
-    console.error("Could not fetch data from 42 API\n", error);
-    const statusText = error instanceof Error ? error.message : "Unknown error";
-    return { props: { statusText } };
-  }
+  const cursusUsers: CursusUser[] = await res.json();
+  return cursusUsers;
 };
 
 const countUserByLevel = (users: CursusUser[]) => {
@@ -97,18 +99,52 @@ const countUserByLevel = (users: CursusUser[]) => {
   return userCountByLevel;
 };
 
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  try {
+    const token = await getToken({ req: context.req });
+    if (!token) {
+      throw new Error("No token found");
+    }
+
+    for (const value of barChartInfo) {
+      value.usersInfo.users = await fetchCursusUsersByCumpusIdAndBeginAt(
+        value.usersInfo.campusId,
+        value.usersInfo.beginAt,
+        token.accessToken
+      );
+      value.usersInfo.userCountByLebel = countUserByLevel(
+        value.usersInfo.users
+      );
+    }
+
+    return { props: { data: barChartInfo } };
+  } catch (error) {
+    console.error("Could not fetch data from 42 API\n", error);
+    const statusText = error instanceof Error ? error.message : "Unknown error";
+    return { props: { statusText } };
+  }
+};
+
 const SameGrade = ({ data, statusText }: Props) => {
-  if (statusText || !data) {
+  if (!data || statusText) {
     return <p>{statusText ?? "Empty Data"}</p>;
   }
-  const userCountByLevel: number[][] = [];
-  userCountByLevel[Campus.Tokyo] = countUserByLevel(data[Campus.Tokyo]);
-  userCountByLevel[Campus.Seoul] = countUserByLevel(data[Campus.Seoul]);
-  userCountByLevel[Campus.Paris] = countUserByLevel(data[Campus.Paris]);
+
   return (
     <Layout>
       <Heading>Same Grade</Heading>
-      <UserCountBarChartByLevel userCountByLevel={userCountByLevel} />
+      {data.map((value: BarChartInfo) => {
+        return (
+          <UserCountBarChartByLevel
+            key={value.usersInfo.campusId}
+            userCountByLevel={value.usersInfo.userCountByLebel ?? []}
+            xAxisLabel={value.displayInfo.xAxisLabel}
+            barColor={value.displayInfo.barColor}
+          />
+        );
+      })}
     </Layout>
   );
 };

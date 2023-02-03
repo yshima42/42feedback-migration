@@ -11,41 +11,27 @@ import {
 } from "recharts";
 
 type Props = {
-  userCountByLevel: number[][];
+  userCountByLevel: number[];
+  xAxisLabel: string;
+  barColor: string;
 };
 
-enum Campus {
-  Tokyo,
-  Seoul,
-  Paris,
-}
-
-export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
-  const loopCount = Math.max(
-    userCountByLevel[Campus.Tokyo].length,
-    userCountByLevel[Campus.Seoul].length,
-    userCountByLevel[Campus.Paris].length
-  );
-  const data: any = [];
-  for (let i = 0; i < loopCount; i++) {
-    data.push({
-      level: `${i}`,
-      "42Tokyo 2021-07-06": userCountByLevel[Campus.Tokyo][i],
-      "42Seoul 2021-05-03": userCountByLevel[Campus.Seoul][i],
-      "42Paris 2021-05-20": userCountByLevel[Campus.Paris][i],
-    });
-  }
-  // const data = .map((count: number, index) => {
-  //   return {
-  //     level: `${index}`,
-  //     "42tokyo 07-06": count,
-  //   };
-  // });
+export const UserCountBarChartByLevel = ({
+  userCountByLevel,
+  xAxisLabel,
+  barColor,
+}: Props) => {
+  const data = userCountByLevel.map((count: number, index) => {
+    return {
+      level: `${index}`,
+      [xAxisLabel]: count,
+    };
+  });
 
   return (
     <BarChart
-      width={1000}
-      height={600}
+      width={500}
+      height={300}
       data={data}
       margin={{
         top: 5,
@@ -68,9 +54,7 @@ export const UserCountBarChartByLevel = ({ userCountByLevel }: Props) => {
       </YAxis>
       <Tooltip />
       <Legend />
-      <Bar dataKey="42Tokyo 2021-07-06" fill="#FF6384" />
-      <Bar dataKey="42Seoul 2021-05-03" fill="#36A2EB" />
-      <Bar dataKey="42Paris 2021-05-20" fill="#FFCE56" />
+      <Bar dataKey={xAxisLabel} fill={barColor} />
     </BarChart>
   );
 };
