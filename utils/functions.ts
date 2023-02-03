@@ -1,3 +1,6 @@
+import axios from "axios";
+import { API_URL } from "./constants";
+
 export const fetchAllDataByFetchAPI = async (
   input: RequestInfo | URL,
   init?: RequestInit
@@ -19,4 +22,26 @@ export const fetchAllDataByFetchAPI = async (
   }
 
   return allData;
+};
+
+export const fetchAccessToken = async () => {
+  const headersList = {
+    Accept: "*/*",
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  const bodyContent = `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`;
+
+  const reqOptions = {
+    url: `${API_URL}/oauth/token`,
+    method: "POST",
+    headers: headersList,
+    data: bodyContent,
+  };
+
+  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
+  const response = await axios.request(reqOptions);
+  const token = response.data;
+
+  return token;
 };
