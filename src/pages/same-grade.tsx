@@ -22,7 +22,7 @@ type UsersInfo = {
   campusId: number;
   beginAt: string;
   userCount?: number;
-  userCountByLebel?: number[];
+  userCountByLevel?: number[];
 };
 
 type DisplayInfo = {
@@ -110,7 +110,7 @@ export const getServerSideProps: GetServerSideProps = async (
         token.accessToken
       );
       value.usersInfo.userCount = users.length;
-      value.usersInfo.userCountByLebel = countUserByLevel(users);
+      value.usersInfo.userCountByLevel = countUserByLevel(users);
     }
 
     return { props: { data: barChartInfo } };
@@ -139,7 +139,7 @@ const SameGrade = ({ data, statusText }: Props) => {
                 " students"}
             </p>
             <UserCountBarChartByLevel
-              userCountByLevel={value.usersInfo.userCountByLebel ?? []}
+              userCountByLevel={value.usersInfo.userCountByLevel ?? []}
               xAxisLabel={value.displayInfo.xAxisLabel}
               barColor={value.displayInfo.barColor}
             />
