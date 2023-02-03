@@ -1,7 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
 import { Box, Heading } from "@chakra-ui/react";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { GetStaticProps } from "next";
 import { getToken, JWT } from "next-auth/jwt";
 import { CursusUser } from "next-auth/providers/42-school";
 import { Token } from "types/token";
@@ -95,7 +95,7 @@ const countUserByLevel = (users: CursusUser[]) => {
   return userCountByLevel;
 };
 
-export const getStaticProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   try {
     let token: Token;
     try {
