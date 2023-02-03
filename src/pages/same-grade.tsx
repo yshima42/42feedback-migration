@@ -4,6 +4,7 @@ import { Box, Heading } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getToken, JWT } from "next-auth/jwt";
 import { CursusUser } from "next-auth/providers/42-school";
+import { Token } from "types/token";
 import {
   API_URL,
   CAMPUS_ID_PARIS,
@@ -11,7 +12,7 @@ import {
   CAMPUS_ID_TOKYO,
   CURSUS_ID,
 } from "utils/constants";
-import { fetchAllDataByFetchAPI } from "utils/functions";
+import { fetchAccessToken, fetchAllDataByFetchAPI } from "utils/functions";
 
 type Props = {
   data?: BarChartInfo[];
@@ -94,20 +95,26 @@ const countUserByLevel = (users: CursusUser[]) => {
   return userCountByLevel;
 };
 
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
+export const getStaticProps: GetServerSideProps = async () => {
   try {
-    const token = await getToken({ req: context.req });
-    if (!token) {
-      throw new Error("No token found");
+    let token: Token;
+    try {
+      token = await fetchAccessToken();
+    } catch (error) {
+      const errorMessage = "アクセストークンの取得に失敗しました";
+      console.log(errorMessage);
+      return {
+        props: {
+          error: errorMessage,
+        },
+      };
     }
 
     for (const value of barChartInfo) {
       const users = await fetchCursusUsersByCampusIdAndBeginAt(
         value.usersInfo.campusId,
         value.usersInfo.beginAt,
-        token.accessToken
+        token.access_token
       );
       value.usersInfo.userCount = users.length;
       value.usersInfo.userCountByLevel = countUserByLevel(users);
