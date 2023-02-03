@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
-import { Heading } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { getToken, JWT } from "next-auth/jwt";
 import { CursusUser } from "next-auth/providers/42-school";
@@ -11,6 +11,7 @@ import {
   CAMPUS_ID_TOKYO,
   CURSUS_ID,
 } from "utils/constants";
+import { fetchAllDataByFetchAPI } from "utils/functions";
 
 type Props = {
   data?: BarChartInfo[];
@@ -72,18 +73,12 @@ const fetchCursusUsersByCumpusIdAndBeginAt = async (
   beginAt: string,
   accessToken: string
 ) => {
-  const res = await fetch(
-    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}&page[size]=100`,
+  const cursusUsers = await fetchAllDataByFetchAPI(
+    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`,
     {
-      headers: {
-        Authorization: "Bearer " + accessToken,
-      },
+      headers: { Authorization: "Bearer " + accessToken },
     }
   );
-  if (!res.ok) {
-    throw new Error(res.statusText);
-  }
-  const cursusUsers: CursusUser[] = await res.json();
   return cursusUsers;
 };
 
@@ -137,12 +132,18 @@ const SameGrade = ({ data, statusText }: Props) => {
       <Heading>Same Grade</Heading>
       {data.map((value: BarChartInfo) => {
         return (
-          <UserCountBarChartByLevel
-            key={value.usersInfo.campusId}
-            userCountByLevel={value.usersInfo.userCountByLebel ?? []}
-            xAxisLabel={value.displayInfo.xAxisLabel}
-            barColor={value.displayInfo.barColor}
-          />
+          <Box key={value.usersInfo.campusId}>
+            <p>
+              {value.displayInfo.xAxisLabel +
+                " / " +
+                value.usersInfo.users?.length}
+            </p>
+            <UserCountBarChartByLevel
+              userCountByLevel={value.usersInfo.userCountByLebel ?? []}
+              xAxisLabel={value.displayInfo.xAxisLabel}
+              barColor={value.displayInfo.barColor}
+            />
+          </Box>
         );
       })}
     </Layout>
