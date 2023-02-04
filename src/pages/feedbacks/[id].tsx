@@ -119,6 +119,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   } catch (error) {
     const errorMessage = "アクセストークンの取得に失敗しました";
     console.log(errorMessage);
+    console.log(error);
     return {
       props: {
         error: errorMessage,
