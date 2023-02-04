@@ -11,7 +11,11 @@ import {
   CAMPUS_ID_TOKYO,
   CURSUS_ID,
 } from "utils/constants";
-import { fetchAccessToken, fetchAllDataByAxios } from "utils/functions";
+import {
+  axiosRetryInSSG,
+  fetchAccessToken,
+  fetchAllDataByAxios,
+} from "utils/functions";
 
 type Props = {
   data?: BarChartInfo[];
@@ -99,6 +103,8 @@ const countUserByLevel = (users: CursusUser[]) => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
+  axiosRetryInSSG();
+
   try {
     let token: Token;
     try {
