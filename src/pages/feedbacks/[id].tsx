@@ -6,6 +6,15 @@ import axios from "axios";
 import { Token } from "types/token";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
+import axiosRetry from "axios-retry";
+
+axiosRetry(axios, {
+  retries: 3,
+  retryDelay: (retryCount) => {
+    return retryCount * 1000;
+  },
+  retryCondition: () => true,
+});
 
 type ProjectReview = {
   id: number;
@@ -110,6 +119,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   } catch (error) {
     const errorMessage = "アクセストークンの取得に失敗しました";
     console.log(errorMessage);
+    console.log(error);
     return {
       props: {
         error: errorMessage,
