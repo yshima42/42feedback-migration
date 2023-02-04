@@ -6,6 +6,16 @@ import axios from "axios";
 import { Token } from "types/token";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
+import axiosRetry from "axios-retry";
+
+axiosRetry(axios, {
+  retries: 3,
+  retryDelay: (retryCount) => {
+    return retryCount * 1000;
+  },
+  retryCondition: () => true,
+  shouldResetTimeout: true,
+});
 
 type ProjectReview = {
   id: number;
