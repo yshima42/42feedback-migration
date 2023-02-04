@@ -14,7 +14,6 @@ axiosRetry(axios, {
     return retryCount * 1000;
   },
   retryCondition: () => true,
-  shouldResetTimeout: true,
 });
 
 type ProjectReview = {
