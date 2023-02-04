@@ -14,7 +14,7 @@ const Home = () => {
       <br />
       <Link href="/review-comments">review comments</Link>
       <br />
-      <Link href="/review-comments-csr">review comments csr</Link>
+      <Link href="/feedbacks">feedbacks</Link>
     </Layout>
   );
 };
