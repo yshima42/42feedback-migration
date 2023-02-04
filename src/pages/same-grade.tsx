@@ -2,7 +2,6 @@ import { Layout } from "@/components/Layout";
 import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
 import { Box, Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
-import { getToken, JWT } from "next-auth/jwt";
 import { CursusUser } from "next-auth/providers/42-school";
 import { Token } from "types/token";
 import {
@@ -12,7 +11,7 @@ import {
   CAMPUS_ID_TOKYO,
   CURSUS_ID,
 } from "utils/constants";
-import { fetchAccessToken, fetchAllDataByFetchAPI } from "utils/functions";
+import { fetchAccessToken, fetchAllDataByAxios } from "utils/functions";
 
 type Props = {
   data?: BarChartInfo[];
@@ -74,12 +73,16 @@ const fetchCursusUsersByCampusIdAndBeginAt = async (
   beginAt: string,
   accessToken: string
 ) => {
-  const cursusUsers = await fetchAllDataByFetchAPI(
-    `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`,
-    {
-      headers: { Authorization: "Bearer " + accessToken },
-    }
-  );
+  const headersList = {
+    Authorization: "Bearer " + accessToken,
+  };
+  const reqOptions = {
+    url: `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`,
+    method: "GET",
+    headers: headersList,
+  };
+  const cursusUsers: CursusUser[] = await fetchAllDataByAxios(reqOptions);
+
   return cursusUsers;
 };
 

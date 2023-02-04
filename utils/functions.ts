@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { API_URL } from "./constants";
 
 export const fetchAllDataByFetchAPI = async (
@@ -19,6 +19,20 @@ export const fetchAllDataByFetchAPI = async (
     nextPageUrl = res.headers
       .get("link")
       ?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
+  }
+
+  return allData;
+};
+
+export const fetchAllDataByAxios = async (reqOptions: AxiosRequestConfig) => {
+  let allData: any[] = [];
+  let nextPageUrl: string = reqOptions?.url ?? "";
+
+  while (nextPageUrl) {
+    const res: AxiosResponse = await axios.request(reqOptions);
+    allData = allData.concat(res.data);
+    nextPageUrl = res.headers["link"]?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
+    reqOptions.url = nextPageUrl;
   }
 
   return allData;
