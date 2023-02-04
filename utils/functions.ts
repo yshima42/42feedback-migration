@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axiosRetry from "axios-retry";
 import { API_URL } from "./constants";
 
 export const fetchAllDataByFetchAPI = async (
@@ -58,4 +59,23 @@ export const fetchAccessToken = async () => {
   const token = response.data;
 
   return token;
+};
+
+export const axiosRetryInSSG = async () => {
+  axiosRetry(axios, {
+    retries: 3,
+    retryDelay: (retryCount) => {
+      return retryCount * 1000;
+    },
+    retryCondition: () => true,
+    onRetry: (retryCount, error) => {
+      const errorMessageObject = {
+        retryCount: retryCount,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+      };
+      console.log(`\n[Axios-retry]`);
+      console.table(errorMessageObject);
+    },
+  });
 };

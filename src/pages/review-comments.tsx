@@ -5,6 +5,7 @@ import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import axios from "axios";
 import { Token } from "types/token";
 import Head from "next/head";
+import { axiosRetryInSSG } from "utils/functions";
 
 const PROJECT_ID = 1331;
 
@@ -87,6 +88,8 @@ const fetchProjectReviews = async (token: Token) => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
+  axiosRetryInSSG();
+
   let token: Token;
   try {
     token = await fetchAccessToken();
