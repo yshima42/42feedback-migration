@@ -68,54 +68,37 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (!context.params) return { notFound: true };
   const projectId = context.params.id as string;
 
-  let token: Token;
   try {
-    token = await fetchAccessToken();
-  } catch (error) {
-    const errorMessage = "アクセストークンの取得に失敗しました";
-    console.log(errorMessage);
-    console.log(error);
-    return {
-      props: {
-        error: errorMessage,
-      },
-    };
-  }
+    const token = await fetchAccessToken();
 
-  let projectReviews: ProjectReview[] = [];
-  try {
-    projectReviews = await fetchProjectReviews(
+    const projectReviews = await fetchProjectReviews(
       token,
       cursusProjects.find((project) => project.slug === projectId)
         ?.slug as string
     );
-  } catch (error) {
-    const errorMessage = "review-commentsの取得に失敗しました";
-    console.log(errorMessage);
+
     return {
       props: {
-        error: errorMessage,
+        projectReviews,
       },
+      revalidate: 60 * 60,
     };
+  } catch (error) {
+    console.log(error);
+    throw new Error("getStaticProps error");
   }
-
-  return {
-    props: {
-      projectReviews,
-    },
-    revalidate: 60 * 60,
-  };
 };
 
 type Props = {
   projectReviews: ProjectReview[];
-  error?: string;
 };
 
 const FeedbackComments = (props: Props) => {
-  const { projectReviews, error } = props;
+  const { projectReviews } = props;
 
-  if (error) return <p>error: {error}</p>;
+  if (!projectReviews) {
+    return <p>{"Error"}</p>;
+  }
 
   return (
     <Layout>
