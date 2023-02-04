@@ -5,7 +5,7 @@ import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import axios from "axios";
 import { Token } from "types/token";
 import Head from "next/head";
-import { cursusProjects } from "./objects";
+import { cursusProjects } from "../../../utils/objects";
 
 type ProjectReview = {
   id: number;

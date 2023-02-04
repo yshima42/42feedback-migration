@@ -1,7 +1,7 @@
 import { Layout } from "@/components/Layout";
 import Link from "next/link";
 import { Heading } from "@chakra-ui/react";
-import { cursusProjects } from "./objects";
+import { cursusProjects } from "../../../utils/objects";
 
 const Feedbacks = () => {
   return (
