@@ -2,12 +2,14 @@ import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
-import axios from "axios";
 import { Token } from "types/token";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
-import axiosRetry from "axios-retry";
-import { axiosRetryInSSG } from "utils/functions";
+import {
+  axiosRetryInSSG,
+  fetchAccessToken,
+  fetchAllDataByAxios,
+} from "utils/functions";
 
 type ProjectReview = {
   id: number;
@@ -16,29 +18,6 @@ type ProjectReview = {
   };
   final_mark: number;
   comment: string;
-};
-
-// 42APIのアクセストークンを取得
-const fetchAccessToken = async () => {
-  const headersList = {
-    Accept: "*/*",
-    "Content-Type": "application/x-www-form-urlencoded",
-  };
-
-  const bodyContent = `grant_type=client_credentials&client_id=${process.env.FORTY_TWO_CLIENT_ID}&client_secret=${process.env.FORTY_TWO_CLIENT_SECRET}`;
-
-  const reqOptions = {
-    url: `${API_URL}/oauth/token`,
-    method: "POST",
-    headers: headersList,
-    data: bodyContent,
-  };
-
-  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
-  const response = await axios.request(reqOptions);
-  const token = response.data;
-
-  return token;
 };
 
 const fetchProjectReviews = async (token: Token, projectId: string) => {
@@ -52,37 +31,18 @@ const fetchProjectReviews = async (token: Token, projectId: string) => {
     headers: headersList,
   };
 
-  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
-  const response = await axios.request(reqOptions);
+  const response = await fetchAllDataByAxios(reqOptions);
 
-  const numberOfContents = response.headers["x-total"];
-  const numberOfPages = Math.ceil(numberOfContents / 100);
-
-  for (let i = 2; i <= numberOfPages; i++) {
-    const reqOptions = {
-      url: `${API_URL}/v2/projects/${projectId}/scale_teams?page[size]=100&page[number]=${i}&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
-      method: "GET",
-      headers: headersList,
+  const projectReviews: ProjectReview[] = response.map((value) => {
+    return {
+      id: value["id"],
+      corrector: {
+        login: value["corrector"]["login"],
+      },
+      final_mark: value["final_mark"],
+      comment: value["comment"],
     };
-
-    const responsesFromSecondPage = await axios.request(reqOptions);
-    responsesFromSecondPage.data.forEach((value: ProjectReview) => {
-      response.data.push(value);
-    });
-  }
-
-  const projectReviews: ProjectReview[] = response.data.map(
-    (value: ProjectReview) => {
-      return {
-        id: value["id"],
-        corrector: {
-          login: value["corrector"]["login"],
-        },
-        final_mark: value["final_mark"],
-        comment: value["comment"],
-      };
-    }
-  );
+  });
 
   return projectReviews;
 };
@@ -104,6 +64,7 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   axiosRetryInSSG();
+
   if (!context.params) return { notFound: true };
   const projectId = context.params.id as string;
 
