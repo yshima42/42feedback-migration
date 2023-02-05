@@ -25,15 +25,30 @@ export const fetchAllDataByFetchAPI = async (
   return allData;
 };
 
+const UNINITIALIZED_LAST_PAGE = -1;
+
 export const fetchAllDataByAxios = async (reqOptions: AxiosRequestConfig) => {
   let allData: any[] = [];
-  let nextPageUrl: string = reqOptions?.url ?? "";
+  let page: number = 1;
+  let lastPage: number = UNINITIALIZED_LAST_PAGE;
+  const baseUrl: string = reqOptions?.url ?? "";
 
-  while (nextPageUrl) {
+  while (true) {
+    reqOptions.url = baseUrl + `&page[number]=${page}&page[size]=100`;
     const res: AxiosResponse = await axios.request(reqOptions);
     allData = allData.concat(res.data);
-    nextPageUrl = res.headers["link"]?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
-    reqOptions.url = nextPageUrl;
+
+    if (lastPage === UNINITIALIZED_LAST_PAGE) {
+      lastPage = Math.ceil(
+        Number(res.headers["x-total"]) / Number(res.headers["x-per-page"])
+      );
+    }
+
+    if (page === lastPage) {
+      break;
+    } else {
+      page++;
+    }
   }
 
   return allData;
@@ -63,16 +78,17 @@ export const fetchAccessToken = async () => {
 
 export const axiosRetryInSSG = async () => {
   axiosRetry(axios, {
-    retries: 3,
+    retries: 5,
     retryDelay: (retryCount) => {
       return retryCount * 1000;
     },
     retryCondition: () => true,
     onRetry: (retryCount, error) => {
       const errorMessageObject = {
-        retryCount: retryCount,
+        url: error.config?.url,
         status: error.response?.status,
         statusText: error.response?.statusText,
+        retryCount: retryCount,
       };
       console.log(`\n[Axios-retry]`);
       console.table(errorMessageObject);
