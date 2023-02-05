@@ -1,41 +1,25 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import axiosRetry from "axios-retry";
 import { API_URL } from "./constants";
 
-export const fetchAllDataByFetchAPI = async (
-  input: RequestInfo | URL,
-  init?: RequestInit
-) => {
-  let allData: any[] = [];
-  let nextPageUrl: RequestInfo | URL | undefined = input;
-
-  while (nextPageUrl) {
-    const res: Response = await fetch(nextPageUrl, init);
-    if (!res.ok) {
-      throw new Error(res.statusText);
-    }
-
-    const data = await res.json();
-    allData = allData.concat(data);
-    nextPageUrl = res.headers
-      .get("link")
-      ?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
-  }
-
-  return allData;
-};
-
 const UNINITIALIZED_LAST_PAGE = -1;
+const PAGE_SIZE = 100;
 
-export const fetchAllDataByAxios = async (reqOptions: AxiosRequestConfig) => {
+export const fetchAllDataByAxios = async (url: string, accessToken: string) => {
   let allData: any[] = [];
   let page: number = 1;
   let lastPage: number = UNINITIALIZED_LAST_PAGE;
-  const baseUrl: string = reqOptions?.url ?? "";
+  const separator = url.includes("?") ? "&" : "?";
 
   while (true) {
-    reqOptions.url = baseUrl + `&page[number]=${page}&page[size]=100`;
-    const res: AxiosResponse = await axios.request(reqOptions);
+    const res: AxiosResponse = await axios.get(
+      `${url}${separator}page[number]=${page}&page[size]=${PAGE_SIZE}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     allData = allData.concat(res.data);
 
     if (lastPage === UNINITIALIZED_LAST_PAGE) {
@@ -69,7 +53,6 @@ export const fetchAccessToken = async () => {
     data: bodyContent,
   };
 
-  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
   const response = await axios.request(reqOptions);
   const token = response.data;
 

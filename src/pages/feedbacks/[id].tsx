@@ -2,7 +2,6 @@ import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
-import { Token } from "types/token";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
 import {
@@ -20,18 +19,9 @@ type ProjectReview = {
   comment: string;
 };
 
-const fetchProjectReviews = async (token: Token, projectId: string) => {
-  const headersList = {
-    Authorization: "Bearer " + token?.access_token,
-  };
-
-  const reqOptions = {
-    url: `${API_URL}/v2/projects/${projectId}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
-    method: "GET",
-    headers: headersList,
-  };
-
-  const response = await fetchAllDataByAxios(reqOptions);
+const fetchProjectReviews = async (projectId: string, accessToken: string) => {
+  const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
+  const response = await fetchAllDataByAxios(url, accessToken);
 
   const projectReviews: ProjectReview[] = response.map((value) => {
     return {
@@ -63,24 +53,26 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  axiosRetryInSSG();
-
+  // 引数のバリデーション
   if (!context.params) return { notFound: true };
+
   const projectId = context.params.id as string;
+  if (!cursusProjects.find((project) => project.slug === projectId)) {
+    return { notFound: true };
+  }
 
+  // データの取得
   try {
-    const token = await fetchAccessToken();
+    axiosRetryInSSG();
 
+    const token = await fetchAccessToken();
     const projectReviews = await fetchProjectReviews(
-      token,
-      cursusProjects.find((project) => project.slug === projectId)
-        ?.slug as string
+      projectId,
+      token.access_token
     );
 
     return {
-      props: {
-        projectReviews,
-      },
+      props: { projectReviews },
       revalidate: 60 * 60,
     };
   } catch (error) {

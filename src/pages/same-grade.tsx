@@ -17,7 +17,7 @@ import {
 } from "utils/functions";
 
 type Props = {
-  data?: BarChartInfo[];
+  data: BarChartInfo[];
 };
 
 type UsersInfo = {
@@ -75,15 +75,8 @@ const fetchCursusUsersByCampusIdAndBeginAt = async (
   beginAt: string,
   accessToken: string
 ) => {
-  const headersList = {
-    Authorization: "Bearer " + accessToken,
-  };
-  const reqOptions = {
-    url: `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`,
-    method: "GET",
-    headers: headersList,
-  };
-  const cursusUsers: CursusUser[] = await fetchAllDataByAxios(reqOptions);
+  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`;
+  const cursusUsers: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
 
   return cursusUsers;
 };
@@ -101,9 +94,9 @@ const countUserByLevel = (users: CursusUser[]) => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  axiosRetryInSSG();
-
   try {
+    axiosRetryInSSG();
+
     const token = await fetchAccessToken();
 
     for (const value of barChartInfo) {
