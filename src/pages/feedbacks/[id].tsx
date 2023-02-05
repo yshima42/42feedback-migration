@@ -2,7 +2,6 @@ import { Layout } from "@/components/Layout";
 import { Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
-import { Token } from "types/token";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
 import {
@@ -20,18 +19,9 @@ type ProjectReview = {
   comment: string;
 };
 
-const fetchProjectReviews = async (token: Token, projectId: string) => {
-  const headersList = {
-    Authorization: "Bearer " + token?.access_token,
-  };
-
-  const reqOptions = {
-    url: `${API_URL}/v2/projects/${projectId}/scale_teams?page[size]=100&page[number]=1&filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`,
-    method: "GET",
-    headers: headersList,
-  };
-
-  const response = await fetchAllDataByAxios(reqOptions);
+const fetchProjectReviews = async (projectId: string, accessToken: string) => {
+  const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
+  const response = await fetchAllDataByAxios(url, accessToken);
 
   const projectReviews: ProjectReview[] = response.map((value) => {
     return {
@@ -63,59 +53,44 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  axiosRetryInSSG();
-
+  // 引数のバリデーション
   if (!context.params) return { notFound: true };
+
   const projectId = context.params.id as string;
-
-  let token: Token;
-  try {
-    token = await fetchAccessToken();
-  } catch (error) {
-    const errorMessage = "アクセストークンの取得に失敗しました";
-    console.log(errorMessage);
-    console.log(error);
-    return {
-      props: {
-        error: errorMessage,
-      },
-    };
+  if (!cursusProjects.find((project) => project.slug === projectId)) {
+    return { notFound: true };
   }
 
-  let projectReviews: ProjectReview[] = [];
+  // データの取得
   try {
-    projectReviews = await fetchProjectReviews(
-      token,
-      cursusProjects.find((project) => project.slug === projectId)
-        ?.slug as string
+    axiosRetryInSSG();
+
+    const token = await fetchAccessToken();
+    const projectReviews = await fetchProjectReviews(
+      projectId,
+      token.access_token
     );
-  } catch (error) {
-    const errorMessage = "review-commentsの取得に失敗しました";
-    console.log(errorMessage);
-    return {
-      props: {
-        error: errorMessage,
-      },
-    };
-  }
 
-  return {
-    props: {
-      projectReviews,
-    },
-    revalidate: 60 * 60,
-  };
+    return {
+      props: { projectReviews },
+      revalidate: 60 * 60,
+    };
+  } catch (error) {
+    console.log(error);
+    throw new Error("getStaticProps error");
+  }
 };
 
 type Props = {
   projectReviews: ProjectReview[];
-  error?: string;
 };
 
 const FeedbackComments = (props: Props) => {
-  const { projectReviews, error } = props;
+  const { projectReviews } = props;
 
-  if (error) return <p>error: {error}</p>;
+  if (!projectReviews) {
+    return <p>{"Error"}</p>;
+  }
 
   return (
     <Layout>

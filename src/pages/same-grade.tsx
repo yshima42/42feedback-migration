@@ -3,7 +3,6 @@ import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserC
 import { Box, Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { CursusUser } from "next-auth/providers/42-school";
-import { Token } from "types/token";
 import {
   API_URL,
   CAMPUS_ID_PARIS,
@@ -18,8 +17,7 @@ import {
 } from "utils/functions";
 
 type Props = {
-  data?: BarChartInfo[];
-  statusText?: string;
+  data: BarChartInfo[];
 };
 
 type UsersInfo = {
@@ -77,15 +75,8 @@ const fetchCursusUsersByCampusIdAndBeginAt = async (
   beginAt: string,
   accessToken: string
 ) => {
-  const headersList = {
-    Authorization: "Bearer " + accessToken,
-  };
-  const reqOptions = {
-    url: `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`,
-    method: "GET",
-    headers: headersList,
-  };
-  const cursusUsers: CursusUser[] = await fetchAllDataByAxios(reqOptions);
+  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`;
+  const cursusUsers: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
 
   return cursusUsers;
 };
@@ -103,21 +94,10 @@ const countUserByLevel = (users: CursusUser[]) => {
 };
 
 export const getStaticProps: GetStaticProps = async () => {
-  axiosRetryInSSG();
-
   try {
-    let token: Token;
-    try {
-      token = await fetchAccessToken();
-    } catch (error) {
-      const errorMessage = "アクセストークンの取得に失敗しました";
-      console.log(errorMessage);
-      return {
-        props: {
-          error: errorMessage,
-        },
-      };
-    }
+    axiosRetryInSSG();
+
+    const token = await fetchAccessToken();
 
     for (const value of barChartInfo) {
       const users = await fetchCursusUsersByCampusIdAndBeginAt(
@@ -131,15 +111,14 @@ export const getStaticProps: GetStaticProps = async () => {
 
     return { props: { data: barChartInfo } };
   } catch (error) {
-    console.error("Could not fetch data from 42 API\n", error);
-    const statusText = error instanceof Error ? error.message : "Unknown error";
-    return { props: { statusText } };
+    console.log(error);
+    throw new Error("getStaticProps error");
   }
 };
 
-const SameGrade = ({ data, statusText }: Props) => {
-  if (!data || statusText) {
-    return <p>{statusText ?? "Empty Data"}</p>;
+const SameGrade = ({ data }: Props) => {
+  if (!data) {
+    return <p>{"Error"}</p>;
   }
 
   return (

@@ -1,39 +1,38 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import axiosRetry from "axios-retry";
 import { API_URL } from "./constants";
 
-export const fetchAllDataByFetchAPI = async (
-  input: RequestInfo | URL,
-  init?: RequestInit
-) => {
-  let allData: any[] = [];
-  let nextPageUrl: RequestInfo | URL | undefined = input;
+const UNINITIALIZED_LAST_PAGE = -1;
+const PAGE_SIZE = 100;
 
-  while (nextPageUrl) {
-    const res: Response = await fetch(nextPageUrl, init);
-    if (!res.ok) {
-      throw new Error(res.statusText);
+export const fetchAllDataByAxios = async (url: string, accessToken: string) => {
+  let allData: any[] = [];
+  let page: number = 1;
+  let lastPage: number = UNINITIALIZED_LAST_PAGE;
+  const separator = url.includes("?") ? "&" : "?";
+
+  while (true) {
+    const res: AxiosResponse = await axios.get(
+      `${url}${separator}page[number]=${page}&page[size]=${PAGE_SIZE}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+    allData = allData.concat(res.data);
+
+    if (lastPage === UNINITIALIZED_LAST_PAGE) {
+      lastPage = Math.ceil(
+        Number(res.headers["x-total"]) / Number(res.headers["x-per-page"])
+      );
     }
 
-    const data = await res.json();
-    allData = allData.concat(data);
-    nextPageUrl = res.headers
-      .get("link")
-      ?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
-  }
-
-  return allData;
-};
-
-export const fetchAllDataByAxios = async (reqOptions: AxiosRequestConfig) => {
-  let allData: any[] = [];
-  let nextPageUrl: string = reqOptions?.url ?? "";
-
-  while (nextPageUrl) {
-    const res: AxiosResponse = await axios.request(reqOptions);
-    allData = allData.concat(res.data);
-    nextPageUrl = res.headers["link"]?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
-    reqOptions.url = nextPageUrl;
+    if (page === lastPage) {
+      break;
+    } else {
+      page++;
+    }
   }
 
   return allData;
@@ -54,7 +53,6 @@ export const fetchAccessToken = async () => {
     data: bodyContent,
   };
 
-  // TODO: 要確認、ここでエラーハンドリングするとでブロイでバグる
   const response = await axios.request(reqOptions);
   const token = response.data;
 
@@ -63,16 +61,17 @@ export const fetchAccessToken = async () => {
 
 export const axiosRetryInSSG = async () => {
   axiosRetry(axios, {
-    retries: 3,
+    retries: 5,
     retryDelay: (retryCount) => {
       return retryCount * 1000;
     },
     retryCondition: () => true,
     onRetry: (retryCount, error) => {
       const errorMessageObject = {
-        retryCount: retryCount,
+        url: error.config?.url,
         status: error.response?.status,
         statusText: error.response?.statusText,
+        retryCount: retryCount,
       };
       console.log(`\n[Axios-retry]`);
       console.table(errorMessageObject);
