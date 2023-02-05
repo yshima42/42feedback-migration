@@ -124,7 +124,6 @@ const SameGrade = ({ data }: Props) => {
   return (
     <Layout>
       <Heading>Same Grade</Heading>
-      <Heading>check</Heading>
       {data.map((value: BarChartInfo) => {
         return (
           <Box key={value.usersInfo.campusId}>
