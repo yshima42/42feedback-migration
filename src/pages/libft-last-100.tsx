@@ -9,7 +9,8 @@ import {
   fetchAllDataByAxios,
 } from "utils/functions";
 import axios from "axios";
-// import { CursusUser } from "next-auth/providers/42-school";
+import { CursusUser } from "types/cursusUsers";
+import { ScaleTeam } from "types/scaleTeam";
 
 type ProjectReview = {
   id: number;
@@ -21,8 +22,13 @@ type ProjectReview = {
   comment: string;
 };
 
-const fetchProjectReviews = async (projectId: string, accessToken: string) => {
-  const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}&page[number]=1&page[size]=100`;
+const fetchProjectReviews = async (
+  projectId: string,
+  accessToken: string,
+  pageNum: number,
+  pageSize: number
+) => {
+  const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}&page[number]=${pageNum}&page[size]=${pageSize}`;
   const response = await axios.get(url, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -37,20 +43,25 @@ const fetchCursusUsers = async (accessToken: string) => {
   return response;
 };
 
-const makeProjectReviews = (scaleTeams: any[], cursusUsers: any[]) => {
+const makeProjectReviews = (
+  scaleTeams: ScaleTeam[],
+  cursusUsers: CursusUser[]
+) => {
   const projectReviews: ProjectReview[] = scaleTeams.map((value: any) => {
-    const login = value["corrector"]["login"];
-    const image = cursusUsers.find(
+    const login = value.corrector.login;
+    const targetCursusUser = cursusUsers.find(
       (cursusUser) => cursusUser.user.login === login
-    )?.user.image.versions.small;
+    );
+
+    const image = targetCursusUser!.user.image.versions.small;
     return {
-      id: value["id"],
+      id: value.id,
       corrector: {
         login: login,
-        image: image,
+        image: image!,
       },
-      final_mark: value["final_mark"],
-      comment: value["comment"],
+      final_mark: value.final_mark,
+      comment: value.comment,
     };
   });
 
@@ -63,7 +74,13 @@ export const getStaticProps: GetStaticProps = async () => {
 
     const token = await fetchAccessToken();
     const projectId = "42cursus-libft";
-    const scaleTeams = await fetchProjectReviews(projectId, token.access_token);
+
+    const scaleTeams = await fetchProjectReviews(
+      projectId,
+      token.access_token,
+      1,
+      100
+    );
     const cursusUsers = await fetchCursusUsers(token.access_token);
     const projectReviews = makeProjectReviews(scaleTeams, cursusUsers);
 
@@ -98,8 +115,6 @@ const FeedbackComments = (props: Props) => {
         {projectReviews.map((value: ProjectReview) => (
           <div key={value["id"]}>
             {value["corrector"]["login"]}
-            <br />
-            {value["corrector"]["image"]}
             <Image
               src={value["corrector"]["image"]}
               alt={`${value["corrector"]["login"]}の画像`}
