@@ -1,5 +1,13 @@
 import { Layout } from "@/components/Layout";
-import { Center, Heading } from "@chakra-ui/react";
+import {
+  Center,
+  Heading,
+  Avatar,
+  HStack,
+  Box,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -11,30 +19,59 @@ import {
 } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
+import { CursusUser } from "types/cursusUsers";
+import { ProjectReview } from "types/projectReview";
+import { FeedbackCard } from "@/components/FeedbackCard";
 
-type ProjectReview = {
-  id: number;
-  corrector: {
-    login: string;
-  };
-  final_mark: number;
-  comment: string;
-};
-
-const fetchProjectReviews = async (projectId: string, accessToken: string) => {
+const fetchProjectReviewsWithoutImage = async (
+  projectId: string,
+  accessToken: string
+) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
   const response = await fetchAllDataByAxios(url, accessToken);
 
-  const projectReviews: ProjectReview[] = response.map((value) => {
+  let projectReviewsWithoutImage: ProjectReview[] = response.map((value) => {
     return {
       id: value["id"],
       corrector: {
         login: value["corrector"]["login"],
+        image: "",
       },
       final_mark: value["final_mark"],
       comment: value["comment"],
     };
   });
+
+  return projectReviewsWithoutImage;
+};
+
+const fetchCursusUsers = async (accessToken: string) => {
+  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}`;
+  const response: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
+  return response;
+};
+
+const makeProjectReviews = (
+  projectReviewsWithoutImage: ProjectReview[],
+  cursusUsers: CursusUser[]
+) => {
+  const projectReviews = projectReviewsWithoutImage.map(
+    (value: ProjectReview) => {
+      const login = value.corrector.login;
+
+      // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
+      // TODO: ここのエラー処理要検討
+      const targetCursusUser = cursusUsers.find(
+        (cursusUser) => cursusUser.user.login === login
+      ) ?? { user: { image: { versions: { small: "" } } } };
+      // console.log(targetCursusUser);
+      const image = targetCursusUser!.user.image.versions.small ?? "";
+
+      value.corrector.image = image;
+
+      return value;
+    }
+  );
 
   return projectReviews;
 };
@@ -68,9 +105,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
     axiosRetryInSSG();
 
     const token = await fetchAccessToken();
-    const projectReviews = await fetchProjectReviews(
+    const projectReviewsWithoutImage = await fetchProjectReviewsWithoutImage(
       projectId,
       token.access_token
+    );
+    const cursusUsers = await fetchCursusUsers(token.access_token);
+
+    const projectReviews = makeProjectReviews(
+      projectReviewsWithoutImage,
+      cursusUsers
     );
 
     return {
@@ -91,19 +134,13 @@ const FeedbackComments = (props: Props) => {
   const { projectReviews } = props;
 
   return (
-    <div>
-      {projectReviews.map((value: ProjectReview) => (
-        <div key={value["id"]}>
-          {value["corrector"]["login"]}
-          <br />
-          final_mark: {value["final_mark"]}
-          <br />
-          comment: {value["comment"]}
-          <br />
-          <br />
-        </div>
+    <>
+      {projectReviews.map((projectReview: ProjectReview) => (
+        <Box key={projectReview.id} mb={4}>
+          <FeedbackCard projectReview={projectReview} />
+        </Box>
       ))}
-    </div>
+    </>
   );
 };
 
