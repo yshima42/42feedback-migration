@@ -3,11 +3,12 @@ import { Heading, Image } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
-import { axiosRetryInSSG, fetchAccessToken } from "utils/functions";
+import { axiosRetryInSSG } from "utils/functions";
 import axios from "axios";
 import { CursusUser } from "types/cursusUsers";
 import { ScaleTeam } from "types/scaleTeam";
 import cursusUsers from "utils/cursus-users.preval";
+import token from "utils/access-token.preval";
 
 type ProjectReview = {
   id: number;
@@ -63,7 +64,6 @@ export const getStaticProps: GetStaticProps = async () => {
   try {
     axiosRetryInSSG();
 
-    const token = await fetchAccessToken();
     const projectId = "42cursus-libft";
 
     const scaleTeams = await fetchProjectReviews(

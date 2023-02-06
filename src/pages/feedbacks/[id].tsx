@@ -23,6 +23,7 @@ import { CursusUser } from "types/cursusUsers";
 import { ProjectReview } from "types/projectReview";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/cursus-users.preval";
+import token from "utils/access-token.preval";
 
 const fetchProjectReviewsWithoutImage = async (
   projectId: string,
@@ -99,7 +100,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    const token = await fetchAccessToken();
+    // const token = await fetchAccessToken();
     const projectReviewsWithoutImage = await fetchProjectReviewsWithoutImage(
       projectId,
       token.access_token
