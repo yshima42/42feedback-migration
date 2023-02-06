@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Center, Heading } from "@chakra-ui/react";
+import { Center, Heading, Avatar } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -11,32 +11,90 @@ import {
 } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
+import { CursusUser } from "types/cursusUsers";
 
 type ProjectReview = {
   id: number;
   corrector: {
     login: string;
+    image: string;
   };
   final_mark: number;
   comment: string;
 };
 
-const fetchProjectReviews = async (projectId: string, accessToken: string) => {
+const fetchProjectReviewsWithoutImage = async (
+  projectId: string,
+  accessToken: string
+) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
   const response = await fetchAllDataByAxios(url, accessToken);
 
-  const projectReviews: ProjectReview[] = response.map((value) => {
+  let projectReviewsWithoutImage: ProjectReview[] = response.map((value) => {
     return {
       id: value["id"],
       corrector: {
         login: value["corrector"]["login"],
+        image: "",
       },
       final_mark: value["final_mark"],
       comment: value["comment"],
     };
   });
 
-  return projectReviews;
+  return projectReviewsWithoutImage;
+};
+
+const fetchCursusUsers = async (accessToken: string) => {
+  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}`;
+  const response: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
+  return response;
+};
+
+const makeProjectReviews = (
+  projectReviewsWithoutImage: ProjectReview[],
+  cursusUsers: CursusUser[]
+) => {
+  const projectReviews = projectReviewsWithoutImage;
+  const temp = projectReviewsWithoutImage.map((value: ProjectReview) => {
+    const login = value.corrector.login;
+
+    // TODO: 要確認、なぜかundefinedが返ってくる
+    const targetCursusUser = cursusUsers.find(
+      (cursusUser) => cursusUser.user.login === login
+    ) ?? { user: { image: { versions: { small: "" } } } };
+    // console.log(targetCursusUser);
+    const image = targetCursusUser!.user.image.versions.small ?? "";
+
+    value.corrector.image = image;
+
+    return value;
+  });
+
+  // // console.log(temp);
+  // console.log(projectReviews);
+
+  // const projectReviews: ProjectReview[] = projectReviewsWithoutImage.map(
+  //   (value: any) => {
+  //     const login = value.corrector.login;
+  //     const targetCursusUser = cursusUsers.find(
+  //       (cursusUser) => cursusUser.user.login === login
+  //     );
+
+  //     const image = targetCursusUser!.user.image.versions.small;
+  //     return {
+  //       id: value.id,
+  //       corrector: {
+  //         login: login,
+  //         image: image!,
+  //       },
+  //       final_mark: value.final_mark,
+  //       comment: value.comment,
+  //     };
+  //   }
+  // );
+
+  return temp;
 };
 
 export const getStaticPaths = async () => {
@@ -68,9 +126,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
     axiosRetryInSSG();
 
     const token = await fetchAccessToken();
-    const projectReviews = await fetchProjectReviews(
+    const projectReviewsWithoutImage = await fetchProjectReviewsWithoutImage(
       projectId,
       token.access_token
+    );
+    const cursusUsers = await fetchCursusUsers(token.access_token);
+
+    const projectReviews = makeProjectReviews(
+      projectReviewsWithoutImage,
+      cursusUsers
     );
 
     return {
@@ -95,6 +159,8 @@ const FeedbackComments = (props: Props) => {
       {projectReviews.map((value: ProjectReview) => (
         <div key={value["id"]}>
           {value["corrector"]["login"]}
+          <br />
+          <Avatar src={value["corrector"]["image"]} />
           <br />
           final_mark: {value["final_mark"]}
           <br />
