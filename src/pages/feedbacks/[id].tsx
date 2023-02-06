@@ -22,6 +22,7 @@ import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
 import { ProjectReview } from "types/projectReview";
 import { FeedbackCard } from "@/components/FeedbackCard";
+import cursusUsers from "utils/cursus-users.preval";
 
 const fetchProjectReviewsWithoutImage = async (
   projectId: string,
@@ -43,12 +44,6 @@ const fetchProjectReviewsWithoutImage = async (
   });
 
   return projectReviewsWithoutImage;
-};
-
-const fetchCursusUsers = async (accessToken: string) => {
-  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}`;
-  const response: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
-  return response;
 };
 
 const makeProjectReviews = (
@@ -109,7 +104,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
       projectId,
       token.access_token
     );
-    const cursusUsers = await fetchCursusUsers(token.access_token);
 
     const projectReviews = makeProjectReviews(
       projectReviewsWithoutImage,
