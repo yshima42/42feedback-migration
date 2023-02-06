@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Heading } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -9,6 +9,8 @@ import {
   fetchAccessToken,
   fetchAllDataByAxios,
 } from "utils/functions";
+import { useEffect, useState } from "react";
+import ReactPaginate from "react-paginate";
 
 type ProjectReview = {
   id: number;
@@ -88,9 +90,48 @@ type Props = {
 const FeedbackComments = (props: Props) => {
   const { projectReviews } = props;
 
-  if (!projectReviews) {
-    return <p>{"Error"}</p>;
-  }
+  return (
+    <div>
+      {projectReviews.map((value: ProjectReview) => (
+        <div key={value["id"]}>
+          {value["corrector"]["login"]}
+          <br />
+          final_mark: {value["final_mark"]}
+          <br />
+          comment: {value["comment"]}
+          <br />
+          <br />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const REVIEWS_PER_PAGE = 50;
+
+const PaginatedFeedbackComments = (props: Props) => {
+  const { projectReviews } = props;
+
+  const [itemOffset, setItemOffset] = useState(0);
+  const endOffset = itemOffset + REVIEWS_PER_PAGE;
+  const currentItems = projectReviews.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(projectReviews.length / REVIEWS_PER_PAGE);
+
+  // ページ遷移時にページトップにスクロール
+  // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
+  // もっと良いものあるかも: https://developer.mozilla.org/ja/docs/Web/API/Window/scrollTo
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentItems]);
+
+  const handlePageChange = (event: { selected: number }) => {
+    const newOffset =
+      (event.selected * REVIEWS_PER_PAGE) % projectReviews.length;
+    setItemOffset(newOffset);
+  };
 
   return (
     <Layout>
@@ -98,21 +139,29 @@ const FeedbackComments = (props: Props) => {
         <meta name="robots" content="noindex,nofollow" />
       </Head>
       <Heading>review-comments</Heading>
-      <div>
-        {projectReviews.map((value: ProjectReview) => (
-          <div key={value["id"]}>
-            {value["corrector"]["login"]}
-            <br />
-            final_mark: {value["final_mark"]}
-            <br />
-            comment: {value["comment"]}
-            <br />
-            <br />
-          </div>
-        ))}
-      </div>
+      <FeedbackComments projectReviews={currentItems} />
+      <Center>
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">"
+          onPageChange={handlePageChange}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel="<"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          breakClassName="page-item"
+          breakLinkClassName="page-link"
+          containerClassName="pagination"
+          activeClassName="active"
+        />
+      </Center>
     </Layout>
   );
 };
 
-export default FeedbackComments;
+export default PaginatedFeedbackComments;
