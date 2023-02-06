@@ -5,7 +5,6 @@ import { Heading } from "@chakra-ui/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// export default function Home() {
 const Home = () => {
   return (
     <Layout>
@@ -13,6 +12,8 @@ const Home = () => {
       <Link href="/same-grade">same grade progress(名前ダサいから変える)</Link>
       <br />
       <Link href="/feedbacks">feedbacks</Link>
+      <br />
+      <Link href="/libft-last-100">libft-last-100</Link>
     </Layout>
   );
 };
