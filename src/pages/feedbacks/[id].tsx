@@ -1,5 +1,13 @@
 import { Layout } from "@/components/Layout";
-import { Center, Heading, Avatar } from "@chakra-ui/react";
+import {
+  Center,
+  Heading,
+  Avatar,
+  HStack,
+  Box,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -12,16 +20,8 @@ import {
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
-
-type ProjectReview = {
-  id: number;
-  corrector: {
-    login: string;
-    image: string;
-  };
-  final_mark: number;
-  comment: string;
-};
+import { ProjectReview } from "types/projectReview";
+import { FeedbackCard } from "@/components/FeedbackCard";
 
 const fetchProjectReviewsWithoutImage = async (
   projectId: string,
@@ -134,21 +134,13 @@ const FeedbackComments = (props: Props) => {
   const { projectReviews } = props;
 
   return (
-    <div>
-      {projectReviews.map((value: ProjectReview) => (
-        <div key={value["id"]}>
-          {value["corrector"]["login"]}
-          <br />
-          <Avatar src={value["corrector"]["image"]} />
-          <br />
-          final_mark: {value["final_mark"]}
-          <br />
-          comment: {value["comment"]}
-          <br />
-          <br />
-        </div>
+    <>
+      {projectReviews.map((projectReview: ProjectReview) => (
+        <Box key={projectReview.id} mb={4}>
+          <FeedbackCard projectReview={projectReview} />
+        </Box>
       ))}
-    </div>
+    </>
   );
 };
 
