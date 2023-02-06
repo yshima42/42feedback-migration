@@ -11,7 +11,7 @@ import {
   CURSUS_ID,
 } from "utils/constants";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
-import token from "utils/access-token.preval";
+import token from "utils/preval/access-token.preval";
 
 type Props = {
   data: BarChartInfo[];

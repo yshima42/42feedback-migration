@@ -1,29 +1,17 @@
 import { Layout } from "@/components/Layout";
-import {
-  Center,
-  Heading,
-  Avatar,
-  HStack,
-  Box,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Center, Heading, Box } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
-import {
-  axiosRetryInSSG,
-  fetchAccessToken,
-  fetchAllDataByAxios,
-} from "utils/functions";
+import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
 import { ProjectReview } from "types/projectReview";
 import { FeedbackCard } from "@/components/FeedbackCard";
-import cursusUsers from "utils/cursus-users.preval";
-import token from "utils/access-token.preval";
+import cursusUsers from "utils/preval/cursus-users.preval";
+import token from "utils/preval/access-token.preval";
 
 const fetchProjectReviewsWithoutImage = async (
   projectId: string,

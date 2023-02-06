@@ -7,8 +7,8 @@ import { axiosRetryInSSG } from "utils/functions";
 import axios from "axios";
 import { CursusUser } from "types/cursusUsers";
 import { ScaleTeam } from "types/scaleTeam";
-import cursusUsers from "utils/cursus-users.preval";
-import token from "utils/access-token.preval";
+import cursusUsers from "utils/preval/cursus-users.preval";
+import token from "utils/preval/access-token.preval";
 
 type ProjectReview = {
   id: number;
