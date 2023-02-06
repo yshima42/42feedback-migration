@@ -9,7 +9,7 @@ import {
   fetchAccessToken,
   fetchAllDataByAxios,
 } from "utils/functions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 
 type ProjectReview = {
@@ -114,9 +114,18 @@ const PaginatedFeedbackComments = (props: Props) => {
 
   const [itemOffset, setItemOffset] = useState(0);
   const endOffset = itemOffset + REVIEWS_PER_PAGE;
-  console.log(`Loading items from ${itemOffset} to ${endOffset}`);
   const currentItems = projectReviews.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(projectReviews.length / REVIEWS_PER_PAGE);
+
+  // ページ遷移時にページトップにスクロール
+  // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
+  // もっと良いものあるかも: https://developer.mozilla.org/ja/docs/Web/API/Window/scrollTo
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentItems]);
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
