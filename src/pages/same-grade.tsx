@@ -1,55 +1,146 @@
 import { Layout } from "@/components/Layout";
-import { LineChartSample } from "@/components/LineChartSample";
-import { Heading } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
+import { Box, Heading } from "@chakra-ui/react";
+import { GetStaticProps } from "next";
+import { CursusUser } from "next-auth/providers/42-school";
+import {
+  API_URL,
+  CAMPUS_ID_PARIS,
+  CAMPUS_ID_SEOUL,
+  CAMPUS_ID_TOKYO,
+  CURSUS_ID,
+} from "utils/constants";
+import {
+  axiosRetryInSSG,
+  fetchAccessToken,
+  fetchAllDataByAxios,
+} from "utils/functions";
 
-const SameGrade = () => {
-  const [data, setData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const ftUrl = "https://api.intra.42.fr/v2/users/hyoshie";
-  const { data: session } = useSession();
-  console.log(session?.accessToken);
-  console.log("Debugging...");
-  console.log("add method");
+type Props = {
+  data: BarChartInfo[];
+};
 
-  useEffect(() => {
-    setIsLoading(false);
-    fetch(ftUrl, {
-      headers: {
-        method: "GET",
-        Authorization: `Bearer ${session?.accessToken}`,
-        mode: "cors",
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          console.log("Error: ", res.status);
-        } else {
-          console.log("OK: ", res.status);
-        }
-        return res.json();
-      })
-      .then((json) => {
-        setData(json);
-      })
-      .catch((error) => {
-        console.error("Catch Error: ", error);
-      });
-  }, [session?.accessToken]);
+type UsersInfo = {
+  campusId: number;
+  beginAt: string;
+  userCount?: number;
+  userCountByLevel?: number[];
+};
 
-  if (isLoading) {
-    return <p>Loading...</p>;
+type DisplayInfo = {
+  xAxisLabel: string;
+  barColor: string;
+};
+
+type BarChartInfo = {
+  usersInfo: UsersInfo;
+  displayInfo: DisplayInfo;
+};
+
+const barChartInfo: BarChartInfo[] = [
+  {
+    usersInfo: {
+      campusId: CAMPUS_ID_TOKYO,
+      beginAt: "2021-07-06T04:00:00.000Z",
+    },
+    displayInfo: {
+      xAxisLabel: "42Tokyo 2021-07-06",
+      barColor: "#FF6384",
+    },
+  },
+  {
+    usersInfo: {
+      campusId: CAMPUS_ID_SEOUL,
+      beginAt: "2021-05-03T00:42:00.000Z",
+    },
+    displayInfo: {
+      xAxisLabel: "42Seoul 2021-05-03",
+      barColor: "#36A2EB",
+    },
+  },
+  {
+    usersInfo: {
+      campusId: CAMPUS_ID_PARIS,
+      beginAt: "2021-05-20T07:42:00.000Z",
+    },
+    displayInfo: {
+      xAxisLabel: "42Paris 2021-05-20",
+      barColor: "#FFCE56",
+    },
+  },
+];
+
+const fetchCursusUsersByCampusIdAndBeginAt = async (
+  campusId: number,
+  beginAt: string,
+  accessToken: string
+) => {
+  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${campusId}&filter[begin_at]=${beginAt}`;
+  const cursusUsers: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
+
+  return cursusUsers;
+};
+
+const countUserByLevel = (users: CursusUser[]) => {
+  const userCountByLevel: number[] = [];
+  users.forEach((user) => {
+    if (userCountByLevel[Math.floor(user.level)]) {
+      userCountByLevel[Math.floor(user.level)]++;
+    } else {
+      userCountByLevel[Math.floor(user.level)] = 1;
+    }
+  });
+  return userCountByLevel;
+};
+
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    axiosRetryInSSG();
+
+    const token = await fetchAccessToken();
+
+    for (const value of barChartInfo) {
+      const users = await fetchCursusUsersByCampusIdAndBeginAt(
+        value.usersInfo.campusId,
+        value.usersInfo.beginAt,
+        token.access_token
+      );
+      value.usersInfo.userCount = users.length;
+      value.usersInfo.userCountByLevel = countUserByLevel(users);
+    }
+
+    return { props: { data: barChartInfo } };
+  } catch (error) {
+    console.log(error);
+    throw new Error("getStaticProps error");
   }
+};
+
+const SameGrade = ({ data }: Props) => {
   if (!data) {
-    return <p>No data</p>;
+    return <p>{"Error"}</p>;
   }
 
   return (
     <Layout>
       <Heading>Same Grade</Heading>
-      <LineChartSample />
-      <p>{JSON.stringify(data)}</p>
+      {data.map((value: BarChartInfo) => {
+        return (
+          <Box key={value.usersInfo.campusId}>
+            <p>
+              {value.displayInfo.xAxisLabel +
+                " / " +
+                value.usersInfo.userCount +
+                " students"}
+            </p>
+            <UserCountBarChartByLevel
+              userCountByLevel={value.usersInfo.userCountByLevel ?? []}
+              xAxisLabel={value.displayInfo.xAxisLabel}
+              barColor={value.displayInfo.barColor}
+            />
+          </Box>
+        );
+      })}
     </Layout>
   );
 };

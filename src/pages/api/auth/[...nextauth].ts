@@ -7,13 +7,13 @@ import FortyTwoProvider from "next-auth/providers/42-school";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
-    accessToken?: string;
+    accessToken: string;
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT extends Record<string, unknown>, DefaultJWT {
-    accessToken?: string;
+    accessToken: string;
   }
 }
 
