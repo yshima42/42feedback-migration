@@ -55,46 +55,25 @@ const makeProjectReviews = (
   projectReviewsWithoutImage: ProjectReview[],
   cursusUsers: CursusUser[]
 ) => {
-  const projectReviews = projectReviewsWithoutImage;
-  const temp = projectReviewsWithoutImage.map((value: ProjectReview) => {
-    const login = value.corrector.login;
+  const projectReviews = projectReviewsWithoutImage.map(
+    (value: ProjectReview) => {
+      const login = value.corrector.login;
 
-    // TODO: 要確認、なぜかundefinedが返ってくる
-    const targetCursusUser = cursusUsers.find(
-      (cursusUser) => cursusUser.user.login === login
-    ) ?? { user: { image: { versions: { small: "" } } } };
-    // console.log(targetCursusUser);
-    const image = targetCursusUser!.user.image.versions.small ?? "";
+      // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
+      // TODO: ここのエラー処理要検討
+      const targetCursusUser = cursusUsers.find(
+        (cursusUser) => cursusUser.user.login === login
+      ) ?? { user: { image: { versions: { small: "" } } } };
+      // console.log(targetCursusUser);
+      const image = targetCursusUser!.user.image.versions.small ?? "";
 
-    value.corrector.image = image;
+      value.corrector.image = image;
 
-    return value;
-  });
+      return value;
+    }
+  );
 
-  // // console.log(temp);
-  // console.log(projectReviews);
-
-  // const projectReviews: ProjectReview[] = projectReviewsWithoutImage.map(
-  //   (value: any) => {
-  //     const login = value.corrector.login;
-  //     const targetCursusUser = cursusUsers.find(
-  //       (cursusUser) => cursusUser.user.login === login
-  //     );
-
-  //     const image = targetCursusUser!.user.image.versions.small;
-  //     return {
-  //       id: value.id,
-  //       corrector: {
-  //         login: login,
-  //         image: image!,
-  //       },
-  //       final_mark: value.final_mark,
-  //       comment: value.comment,
-  //     };
-  //   }
-  // );
-
-  return temp;
+  return projectReviews;
 };
 
 export const getStaticPaths = async () => {
