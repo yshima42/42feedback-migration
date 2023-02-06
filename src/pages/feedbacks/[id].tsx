@@ -9,6 +9,8 @@ import {
   fetchAccessToken,
   fetchAllDataByAxios,
 } from "utils/functions";
+import { useState } from "react";
+import ReactPaginate from "react-paginate";
 
 type ProjectReview = {
   id: number;
@@ -88,9 +90,39 @@ type Props = {
 const FeedbackComments = (props: Props) => {
   const { projectReviews } = props;
 
-  if (!projectReviews) {
-    return <p>{"Error"}</p>;
-  }
+  return (
+    <div>
+      {projectReviews.map((value: ProjectReview) => (
+        <div key={value["id"]}>
+          {value["corrector"]["login"]}
+          <br />
+          final_mark: {value["final_mark"]}
+          <br />
+          comment: {value["comment"]}
+          <br />
+          <br />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const REVIEWS_PER_PAGE = 10;
+
+const PaginatedFeedbackComments = (props: Props) => {
+  const { projectReviews } = props;
+
+  const [itemOffset, setItemOffset] = useState(0);
+  const endOffset = itemOffset + REVIEWS_PER_PAGE;
+  console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+  const currentItems = projectReviews.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(projectReviews.length / REVIEWS_PER_PAGE);
+
+  const handlePageChange = (event: { selected: number }) => {
+    const newOffset =
+      (event.selected * REVIEWS_PER_PAGE) % projectReviews.length;
+    setItemOffset(newOffset);
+  };
 
   return (
     <Layout>
@@ -98,21 +130,17 @@ const FeedbackComments = (props: Props) => {
         <meta name="robots" content="noindex,nofollow" />
       </Head>
       <Heading>review-comments</Heading>
-      <div>
-        {projectReviews.map((value: ProjectReview) => (
-          <div key={value["id"]}>
-            {value["corrector"]["login"]}
-            <br />
-            final_mark: {value["final_mark"]}
-            <br />
-            comment: {value["comment"]}
-            <br />
-            <br />
-          </div>
-        ))}
-      </div>
+      <FeedbackComments projectReviews={currentItems} />
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel="next"
+        onPageChange={handlePageChange}
+        pageRangeDisplayed={5}
+        pageCount={pageCount}
+        previousLabel="previous"
+      />
     </Layout>
   );
 };
 
-export default FeedbackComments;
+export default PaginatedFeedbackComments;
