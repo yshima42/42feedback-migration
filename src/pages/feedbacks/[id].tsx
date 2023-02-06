@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Heading } from "@chakra-ui/react";
+import { Center, Heading } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -107,7 +107,7 @@ const FeedbackComments = (props: Props) => {
   );
 };
 
-const REVIEWS_PER_PAGE = 10;
+const REVIEWS_PER_PAGE = 50;
 
 const PaginatedFeedbackComments = (props: Props) => {
   const { projectReviews } = props;
@@ -131,14 +131,26 @@ const PaginatedFeedbackComments = (props: Props) => {
       </Head>
       <Heading>review-comments</Heading>
       <FeedbackComments projectReviews={currentItems} />
-      <ReactPaginate
-        breakLabel="..."
-        nextLabel="next"
-        onPageChange={handlePageChange}
-        pageRangeDisplayed={5}
-        pageCount={pageCount}
-        previousLabel="previous"
-      />
+      <Center>
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">"
+          onPageChange={handlePageChange}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel="<"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          breakClassName="page-item"
+          breakLinkClassName="page-link"
+          containerClassName="pagination"
+          activeClassName="active"
+        />
+      </Center>
     </Layout>
   );
 };
