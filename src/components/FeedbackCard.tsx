@@ -1,4 +1,5 @@
 import { Avatar, Box, Heading, HStack, Text, VStack } from "@chakra-ui/react";
+import Link from "next/link";
 import { ProjectReview } from "types/projectReview";
 
 export const FeedbackCard = (props: { projectReview: ProjectReview }) => {
@@ -8,11 +9,15 @@ export const FeedbackCard = (props: { projectReview: ProjectReview }) => {
     <>
       <HStack>
         <Avatar src={projectReview.corrector.image} />
-        <VStack>
-          <Text fontSize="md">
-            {projectReview.corrector.login}: {projectReview.final_mark}
-          </Text>
-        </VStack>
+        <Text fontSize="md">Evaluated by</Text>
+        <Link
+          href={`https://profile.intra.42.fr/users/${projectReview.corrector.login}`}
+        >
+          {projectReview.corrector.login}
+        </Link>
+        <Box alignItems="right" justifyContent={"center"}>
+          <Text>{projectReview.final_mark}</Text>
+        </Box>
       </HStack>
       <Box
         bg="gray.100"

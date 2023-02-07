@@ -21,20 +21,35 @@ const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   return response;
 };
 
+// ここもしわかりにくかったら教えてください
+const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
+  if (
+    // コメントがない場合は除外
+    scaleTeam.comment !== null &&
+    // cursus_usersに存在しないユーザーは除外
+    cursusUsers.find(
+      (cursusUser) => cursusUser.user.login === scaleTeam.corrector.login
+    )
+  ) {
+    return true;
+  }
+  return false;
+};
+
 const makeProjectReviews = (
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
-  // validateする
+  // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合のvalidate処理
+  const validScaleTeams = scaleTeams.filter(isValidScaleTeam);
 
-  const projectReviews = scaleTeams.map((value: ScaleTeam) => {
+  const projectReviews = validScaleTeams.map((value: ScaleTeam) => {
     const login = value.corrector.login;
 
-    // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
-    // TODO: ここのエラー処理要検討
     const targetCursusUser = cursusUsers.find(
       (cursusUser) => cursusUser.user.login === login
-    ) ?? { user: { image: { versions: { small: "" } } } };
+    );
+    // 万が一urlが存在しない場合は空文字を入れる
     const image = targetCursusUser!.user.image.versions.small ?? "";
 
     return {
@@ -68,7 +83,9 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   // 引数のバリデーション
-  if (!context.params) return { notFound: true };
+  if (!context.params) {
+    return { notFound: true };
+  }
 
   const projectId = context.params.id as string;
   if (!cursusProjects.find((project) => project.slug === projectId)) {
@@ -79,7 +96,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    // const token = await fetchAccessToken();
     const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
 
     const projectReviews = makeProjectReviews(scaleTeams, cursusUsers);
