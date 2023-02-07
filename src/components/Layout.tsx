@@ -1,3 +1,4 @@
+import { Container } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
 import Header from "./Header";
 
@@ -8,7 +9,9 @@ type Props = {
 export const Layout: React.FC<Props> = (props) => (
   <div>
     <Header />
-    <div className="layout">{props.children}</div>
+    <Container maxW="container.xl">
+      <div className="layout">{props.children}</div>
+    </Container>
     <style jsx global>{`
       html {
         box-sizing: border-box;
