@@ -1,22 +1,22 @@
 import { Avatar, Box, Heading, HStack, Text, VStack } from "@chakra-ui/react";
 import Link from "next/link";
-import { ProjectReview } from "types/projectReview";
+import { ProjectFeedback } from "types/projectFeedback";
 
-export const FeedbackCard = (props: { projectReview: ProjectReview }) => {
-  const { projectReview } = props;
+export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
+  const { projectFeedback } = props;
 
   return (
     <>
       <HStack>
-        <Avatar src={projectReview.corrector.image} />
+        <Avatar src={projectFeedback.corrector.image} />
         <Text fontSize="md">Evaluated by</Text>
         <Link
-          href={`https://profile.intra.42.fr/users/${projectReview.corrector.login}`}
+          href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
         >
-          {projectReview.corrector.login}
+          {projectFeedback.corrector.login}
         </Link>
         <Box alignItems="right" justifyContent={"center"}>
-          <Text>{projectReview.final_mark}</Text>
+          <Text>{projectFeedback.final_mark}</Text>
         </Box>
       </HStack>
       <Box
@@ -26,7 +26,7 @@ export const FeedbackCard = (props: { projectReview: ProjectReview }) => {
         boxShadow="md"
         whiteSpace="pre-wrap"
       >
-        {projectReview.comment}
+        {projectFeedback.comment}
       </Box>
     </>
   );

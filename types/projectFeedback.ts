@@ -1,4 +1,4 @@
-export type ProjectReview = {
+export type ProjectFeedback = {
   id: number;
   corrector: {
     login: string;

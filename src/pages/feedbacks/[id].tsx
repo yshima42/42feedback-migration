@@ -8,7 +8,7 @@ import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
-import { ProjectReview } from "types/projectReview";
+import { ProjectFeedback } from "types/projectFeedback";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
@@ -36,14 +36,14 @@ const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
   return false;
 };
 
-const makeProjectReviews = (
+const makeProjectFeedbacks = (
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
   // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合のvalidate処理
   const validScaleTeams = scaleTeams.filter(isValidScaleTeam);
 
-  const projectReviews = validScaleTeams.map((value: ScaleTeam) => {
+  const projectFeedbacks = validScaleTeams.map((value: ScaleTeam) => {
     const login = value.corrector.login;
 
     const targetCursusUser = cursusUsers.find(
@@ -63,7 +63,7 @@ const makeProjectReviews = (
     };
   });
 
-  return projectReviews;
+  return projectFeedbacks;
 };
 
 export const getStaticPaths = async () => {
@@ -98,10 +98,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
 
-    const projectReviews = makeProjectReviews(scaleTeams, cursusUsers);
+    const projectFeedbacks = makeProjectFeedbacks(scaleTeams, cursusUsers);
 
     return {
-      props: { projectReviews },
+      props: { projectFeedbacks },
       revalidate: 60 * 60,
     };
   } catch (error) {
@@ -111,32 +111,32 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 type Props = {
-  projectReviews: ProjectReview[];
+  projectFeedbacks: ProjectFeedback[];
 };
 
-const FeedbackComments = (props: Props) => {
-  const { projectReviews } = props;
+const ProjectFeedbacks = (props: Props) => {
+  const { projectFeedbacks } = props;
 
   return (
     <>
-      {projectReviews.map((projectReview: ProjectReview) => (
-        <Box key={projectReview.id} mb={8}>
-          <FeedbackCard projectReview={projectReview} />
+      {projectFeedbacks.map((projectFeedback: ProjectFeedback) => (
+        <Box key={projectFeedback.id} mb={8}>
+          <FeedbackCard projectFeedback={projectFeedback} />
         </Box>
       ))}
     </>
   );
 };
 
-const REVIEWS_PER_PAGE = 20;
+const FEEDBACKS_PER_PAGE = 20;
 
-const PaginatedFeedbackComments = (props: Props) => {
-  const { projectReviews } = props;
+const PaginatedProjectFeedbacks = (props: Props) => {
+  const { projectFeedbacks } = props;
 
   const [itemOffset, setItemOffset] = useState(0);
-  const endOffset = itemOffset + REVIEWS_PER_PAGE;
-  const currentItems = projectReviews.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(projectReviews.length / REVIEWS_PER_PAGE);
+  const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
+  const currentItems = projectFeedbacks.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(projectFeedbacks.length / FEEDBACKS_PER_PAGE);
 
   // ページ遷移時にページトップにスクロール
   // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
@@ -150,7 +150,7 @@ const PaginatedFeedbackComments = (props: Props) => {
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
-      (event.selected * REVIEWS_PER_PAGE) % projectReviews.length;
+      (event.selected * FEEDBACKS_PER_PAGE) % projectFeedbacks.length;
     setItemOffset(newOffset);
   };
 
@@ -159,8 +159,8 @@ const PaginatedFeedbackComments = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Heading>review-comments</Heading>
-      <FeedbackComments projectReviews={currentItems} />
+      <Heading>42Feedbacks</Heading>
+      <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate
           breakLabel="..."
@@ -185,4 +185,4 @@ const PaginatedFeedbackComments = (props: Props) => {
   );
 };
 
-export default PaginatedFeedbackComments;
+export default PaginatedProjectFeedbacks;
