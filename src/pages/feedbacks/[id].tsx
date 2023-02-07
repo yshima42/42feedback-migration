@@ -21,7 +21,7 @@ const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   return response;
 };
 
-// ここわかりにくいかな？もしわかりにくかったら教えてください！
+// ここもしわかりにくかったら教えてください
 const filterValidScaleTeams = (scaleTeam: ScaleTeam) => {
   if (
     // コメントがない場合は除外
