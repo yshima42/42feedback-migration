@@ -1,79 +1,69 @@
 import { Layout } from "@/components/Layout";
-import {
-  Center,
-  Heading,
-  Avatar,
-  HStack,
-  Box,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Center, Heading, Box } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
-import {
-  axiosRetryInSSG,
-  fetchAccessToken,
-  fetchAllDataByAxios,
-} from "utils/functions";
+import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
-import { ProjectReview } from "types/projectReview";
+import { ProjectFeedback } from "types/projectFeedback";
 import { FeedbackCard } from "@/components/FeedbackCard";
+import cursusUsers from "utils/preval/cursus-users.preval";
+import token from "utils/preval/access-token.preval";
+import { ScaleTeam } from "types/scaleTeam";
 
-const fetchProjectReviewsWithoutImage = async (
-  projectId: string,
-  accessToken: string
-) => {
+const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
   const response = await fetchAllDataByAxios(url, accessToken);
 
-  let projectReviewsWithoutImage: ProjectReview[] = response.map((value) => {
-    return {
-      id: value["id"],
-      corrector: {
-        login: value["corrector"]["login"],
-        image: "",
-      },
-      final_mark: value["final_mark"],
-      comment: value["comment"],
-    };
-  });
-
-  return projectReviewsWithoutImage;
-};
-
-const fetchCursusUsers = async (accessToken: string) => {
-  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}`;
-  const response: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
   return response;
 };
 
-const makeProjectReviews = (
-  projectReviewsWithoutImage: ProjectReview[],
+// ここもしわかりにくかったら教えてください
+const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
+  if (
+    // コメントがない場合は除外
+    scaleTeam.comment !== null &&
+    // cursus_usersに存在しないユーザーは除外
+    cursusUsers.find(
+      (cursusUser) => cursusUser.user.login === scaleTeam.corrector.login
+    )
+  ) {
+    return true;
+  }
+  return false;
+};
+
+const makeProjectFeedbacks = (
+  scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
-  const projectReviews = projectReviewsWithoutImage.map(
-    (value: ProjectReview) => {
-      const login = value.corrector.login;
+  // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合のvalidate処理
+  const validScaleTeams = scaleTeams.filter(isValidScaleTeam);
 
-      // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
-      // TODO: ここのエラー処理要検討
-      const targetCursusUser = cursusUsers.find(
-        (cursusUser) => cursusUser.user.login === login
-      ) ?? { user: { image: { versions: { small: "" } } } };
-      // console.log(targetCursusUser);
-      const image = targetCursusUser!.user.image.versions.small ?? "";
+  const projectFeedbacks = validScaleTeams.map((value: ScaleTeam) => {
+    const login = value.corrector.login;
 
-      value.corrector.image = image;
+    const targetCursusUser = cursusUsers.find(
+      (cursusUser) => cursusUser.user.login === login
+    );
+    // 万が一urlが存在しない場合は空文字を入れる
+    const image = targetCursusUser!.user.image.versions.small ?? "";
 
-      return value;
-    }
-  );
+    return {
+      id: value.id,
+      corrector: {
+        login: login,
+        image: image,
+      },
+      final_mark: value.final_mark,
+      comment: value.comment,
+    };
+  });
 
-  return projectReviews;
+  return projectFeedbacks;
 };
 
 export const getStaticPaths = async () => {
@@ -93,7 +83,9 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   // 引数のバリデーション
-  if (!context.params) return { notFound: true };
+  if (!context.params) {
+    return { notFound: true };
+  }
 
   const projectId = context.params.id as string;
   if (!cursusProjects.find((project) => project.slug === projectId)) {
@@ -104,20 +96,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    const token = await fetchAccessToken();
-    const projectReviewsWithoutImage = await fetchProjectReviewsWithoutImage(
-      projectId,
-      token.access_token
-    );
-    const cursusUsers = await fetchCursusUsers(token.access_token);
+    const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
 
-    const projectReviews = makeProjectReviews(
-      projectReviewsWithoutImage,
-      cursusUsers
-    );
+    const projectFeedbacks = makeProjectFeedbacks(scaleTeams, cursusUsers);
 
     return {
-      props: { projectReviews },
+      props: { projectFeedbacks },
       revalidate: 60 * 60,
     };
   } catch (error) {
@@ -127,32 +111,32 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 type Props = {
-  projectReviews: ProjectReview[];
+  projectFeedbacks: ProjectFeedback[];
 };
 
-const FeedbackComments = (props: Props) => {
-  const { projectReviews } = props;
+const ProjectFeedbacks = (props: Props) => {
+  const { projectFeedbacks } = props;
 
   return (
     <>
-      {projectReviews.map((projectReview: ProjectReview) => (
-        <Box key={projectReview.id} mb={4}>
-          <FeedbackCard projectReview={projectReview} />
+      {projectFeedbacks.map((projectFeedback: ProjectFeedback) => (
+        <Box key={projectFeedback.id} mb={8}>
+          <FeedbackCard projectFeedback={projectFeedback} />
         </Box>
       ))}
     </>
   );
 };
 
-const REVIEWS_PER_PAGE = 50;
+const FEEDBACKS_PER_PAGE = 20;
 
-const PaginatedFeedbackComments = (props: Props) => {
-  const { projectReviews } = props;
+const PaginatedProjectFeedbacks = (props: Props) => {
+  const { projectFeedbacks } = props;
 
   const [itemOffset, setItemOffset] = useState(0);
-  const endOffset = itemOffset + REVIEWS_PER_PAGE;
-  const currentItems = projectReviews.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(projectReviews.length / REVIEWS_PER_PAGE);
+  const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
+  const currentItems = projectFeedbacks.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(projectFeedbacks.length / FEEDBACKS_PER_PAGE);
 
   // ページ遷移時にページトップにスクロール
   // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
@@ -166,7 +150,7 @@ const PaginatedFeedbackComments = (props: Props) => {
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
-      (event.selected * REVIEWS_PER_PAGE) % projectReviews.length;
+      (event.selected * FEEDBACKS_PER_PAGE) % projectFeedbacks.length;
     setItemOffset(newOffset);
   };
 
@@ -175,8 +159,8 @@ const PaginatedFeedbackComments = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Heading>review-comments</Heading>
-      <FeedbackComments projectReviews={currentItems} />
+      <Heading>42Feedbacks</Heading>
+      <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate
           breakLabel="..."
@@ -201,4 +185,4 @@ const PaginatedFeedbackComments = (props: Props) => {
   );
 };
 
-export default PaginatedFeedbackComments;
+export default PaginatedProjectFeedbacks;
