@@ -22,7 +22,7 @@ const fetchScaleTeams = async (projectId: string, accessToken: string) => {
 };
 
 // ここもしわかりにくかったら教えてください
-const filterValidScaleTeams = (scaleTeam: ScaleTeam) => {
+const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
   if (
     // コメントがない場合は除外
     scaleTeam.comment !== null &&
@@ -41,9 +41,9 @@ const makeProjectFeedbacks = (
   cursusUsers: CursusUser[]
 ) => {
   // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合のvalidate処理
-  const filteredScaleTeams = scaleTeams.filter(filterValidScaleTeams);
+  const validScaleTeams = scaleTeams.filter(isValidScaleTeam);
 
-  const projectFeedbacks = filteredScaleTeams.map((value: ScaleTeam) => {
+  const projectFeedbacks = validScaleTeams.map((value: ScaleTeam) => {
     const login = value.corrector.login;
 
     const targetCursusUser = cursusUsers.find(
