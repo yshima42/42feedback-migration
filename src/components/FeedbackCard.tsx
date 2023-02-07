@@ -20,8 +20,6 @@ export const FeedbackCard = (props: { projectReview: ProjectReview }) => {
         borderRadius="md"
         boxShadow="md"
         whiteSpace="pre-wrap"
-        marginLeft={{ base: "0", md: "12" }}
-        marginBottom="2"
       >
         {projectReview.comment}
       </Box>

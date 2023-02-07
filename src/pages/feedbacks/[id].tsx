@@ -1,13 +1,5 @@
 import { Layout } from "@/components/Layout";
-import {
-  Center,
-  Heading,
-  Avatar,
-  HStack,
-  Box,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Center, Heading, Box } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -55,6 +47,8 @@ const makeProjectReviews = (
   projectReviewsWithoutImage: ProjectReview[],
   cursusUsers: CursusUser[]
 ) => {
+  // validateする
+
   const projectReviews = projectReviewsWithoutImage.map(
     (value: ProjectReview) => {
       const login = value.corrector.login;
@@ -136,7 +130,7 @@ const FeedbackComments = (props: Props) => {
   return (
     <>
       {projectReviews.map((projectReview: ProjectReview) => (
-        <Box key={projectReview.id} mb={4}>
+        <Box key={projectReview.id} mb={8}>
           <FeedbackCard projectReview={projectReview} />
         </Box>
       ))}
@@ -144,7 +138,7 @@ const FeedbackComments = (props: Props) => {
   );
 };
 
-const REVIEWS_PER_PAGE = 50;
+const REVIEWS_PER_PAGE = 10;
 
 const PaginatedFeedbackComments = (props: Props) => {
   const { projectReviews } = props;
