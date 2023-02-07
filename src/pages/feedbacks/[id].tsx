@@ -60,6 +60,11 @@ const makeProjectFeedbacks = (
       },
       final_mark: value.final_mark,
       comment: value.comment,
+      team: {
+        users: {
+          projects_user_id: value.team.users[0].projects_user_id,
+        },
+      },
     };
   });
 
@@ -159,7 +164,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Heading>42Feedbacks</Heading>
+      <Heading>Feedbacks</Heading>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate

@@ -6,4 +6,9 @@ export type ProjectFeedback = {
   };
   final_mark: number;
   comment: string;
+  team: {
+    users: {
+      projects_user_id: number;
+    };
+  };
 };

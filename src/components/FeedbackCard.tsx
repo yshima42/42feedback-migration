@@ -1,9 +1,21 @@
-import { Avatar, Box, Heading, HStack, Text, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Flex, HStack, Text, VStack } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { ProjectFeedback } from "types/projectFeedback";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const { projectFeedback } = props;
+  // const router = useRouter();
+  // const query = router.query;
+  // const [slug, setSlug] = useState<string>("");
+
+  // useEffect(() => {
+  //   if (router.isReady) {
+  //     setSlug(query.id as string);
+  //   }
+  // }, [query, router.isReady]);
 
   return (
     <>
@@ -22,6 +34,16 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
             <Text color="tomato">{projectFeedback.final_mark}%</Text>
           )}
         </Box>
+        <Flex justifyContent="right">
+          <Link
+            href={`https://projects.intra.42.fr/projects/ft_transcendence/projects_users/${projectFeedback.team.users.projects_user_id}`}
+          >
+            <HStack>
+              <Text fontSize="md">View on intra</Text>
+              <ExternalLinkIcon boxSize={3} />
+            </HStack>
+          </Link>
+        </Flex>
       </HStack>
       <Box
         bg="gray.100"
