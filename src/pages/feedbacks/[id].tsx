@@ -68,7 +68,9 @@ export const getStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
   // 引数のバリデーション
-  if (!context.params) return { notFound: true };
+  if (!context.params) {
+    return { notFound: true };
+  }
 
   const projectId = context.params.id as string;
   if (!cursusProjects.find((project) => project.slug === projectId)) {
@@ -79,7 +81,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    // const token = await fetchAccessToken();
     const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
 
     const projectReviews = makeProjectReviews(scaleTeams, cursusUsers);
