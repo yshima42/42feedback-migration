@@ -39,7 +39,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
             href={`https://projects.intra.42.fr/projects/ft_transcendence/projects_users/${projectFeedback.team.users.projects_user_id}`}
           >
             <HStack>
-              <Text fontSize="md">View on intra</Text>
+              <Text fontSize="md">intra</Text>
               <ExternalLinkIcon boxSize={3} />
             </HStack>
           </Link>
