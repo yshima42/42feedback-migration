@@ -12,52 +12,41 @@ import { ProjectReview } from "types/projectReview";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
+import { ScaleTeam } from "types/scaleTeam";
 
-const fetchProjectReviewsWithoutImage = async (
-  projectId: string,
-  accessToken: string
-) => {
+const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
   const response = await fetchAllDataByAxios(url, accessToken);
 
-  let projectReviewsWithoutImage: ProjectReview[] = response.map((value) => {
-    return {
-      id: value["id"],
-      corrector: {
-        login: value["corrector"]["login"],
-        image: "",
-      },
-      final_mark: value["final_mark"],
-      comment: value["comment"],
-    };
-  });
-
-  return projectReviewsWithoutImage;
+  return response;
 };
 
 const makeProjectReviews = (
-  projectReviewsWithoutImage: ProjectReview[],
+  scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
   // validateする
 
-  const projectReviews = projectReviewsWithoutImage.map(
-    (value: ProjectReview) => {
-      const login = value.corrector.login;
+  const projectReviews = scaleTeams.map((value: ScaleTeam) => {
+    const login = value.corrector.login;
 
-      // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
-      // TODO: ここのエラー処理要検討
-      const targetCursusUser = cursusUsers.find(
-        (cursusUser) => cursusUser.user.login === login
-      ) ?? { user: { image: { versions: { small: "" } } } };
-      // console.log(targetCursusUser);
-      const image = targetCursusUser!.user.image.versions.small ?? "";
+    // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
+    // TODO: ここのエラー処理要検討
+    const targetCursusUser = cursusUsers.find(
+      (cursusUser) => cursusUser.user.login === login
+    ) ?? { user: { image: { versions: { small: "" } } } };
+    const image = targetCursusUser!.user.image.versions.small ?? "";
 
-      value.corrector.image = image;
-
-      return value;
-    }
-  );
+    return {
+      id: value.id,
+      corrector: {
+        login: login,
+        image: image,
+      },
+      final_mark: value.final_mark,
+      comment: value.comment,
+    };
+  });
 
   return projectReviews;
 };
@@ -91,15 +80,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     axiosRetryInSSG();
 
     // const token = await fetchAccessToken();
-    const projectReviewsWithoutImage = await fetchProjectReviewsWithoutImage(
-      projectId,
-      token.access_token
-    );
+    const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
 
-    const projectReviews = makeProjectReviews(
-      projectReviewsWithoutImage,
-      cursusUsers
-    );
+    const projectReviews = makeProjectReviews(scaleTeams, cursusUsers);
 
     return {
       props: { projectReviews },
@@ -129,7 +112,7 @@ const FeedbackComments = (props: Props) => {
   );
 };
 
-const REVIEWS_PER_PAGE = 10;
+const REVIEWS_PER_PAGE = 20;
 
 const PaginatedFeedbackComments = (props: Props) => {
   const { projectReviews } = props;
