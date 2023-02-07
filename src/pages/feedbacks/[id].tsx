@@ -4,16 +4,14 @@ import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../../utils/objects";
-import {
-  axiosRetryInSSG,
-  fetchAccessToken,
-  fetchAllDataByAxios,
-} from "utils/functions";
+import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
 import { ProjectReview } from "types/projectReview";
 import { FeedbackCard } from "@/components/FeedbackCard";
+import cursusUsers from "utils/preval/cursus-users.preval";
+import token from "utils/preval/access-token.preval";
 
 const fetchProjectReviewsWithoutImage = async (
   projectId: string,
@@ -35,12 +33,6 @@ const fetchProjectReviewsWithoutImage = async (
   });
 
   return projectReviewsWithoutImage;
-};
-
-const fetchCursusUsers = async (accessToken: string) => {
-  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}`;
-  const response: CursusUser[] = await fetchAllDataByAxios(url, accessToken);
-  return response;
 };
 
 const makeProjectReviews = (
@@ -98,12 +90,11 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    const token = await fetchAccessToken();
+    // const token = await fetchAccessToken();
     const projectReviewsWithoutImage = await fetchProjectReviewsWithoutImage(
       projectId,
       token.access_token
     );
-    const cursusUsers = await fetchCursusUsers(token.access_token);
 
     const projectReviews = makeProjectReviews(
       projectReviewsWithoutImage,
