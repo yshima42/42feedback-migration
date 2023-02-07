@@ -21,20 +21,35 @@ const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   return response;
 };
 
+// ここわかりにくいかな？もしわかりにくかったら教えてください！
+const filterValidScaleTeams = (scaleTeam: ScaleTeam) => {
+  if (
+    // コメントがない場合は除外
+    scaleTeam.comment !== null &&
+    // cursus_usersに存在しないユーザーは除外
+    cursusUsers.find(
+      (cursusUser) => cursusUser.user.login === scaleTeam.corrector.login
+    )
+  ) {
+    return true;
+  }
+  return false;
+};
+
 const makeProjectReviews = (
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
-  // validateする
+  // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合のvalidate処理
+  const filteredScaleTeams = scaleTeams.filter(filterValidScaleTeams);
 
-  const projectReviews = scaleTeams.map((value: ScaleTeam) => {
+  const projectReviews = filteredScaleTeams.map((value: ScaleTeam) => {
     const login = value.corrector.login;
 
-    // 42apiのバグでcursus_usersの中に存在しないユーザーがいる場合があるので、その場合は画像を空にする
-    // TODO: ここのエラー処理要検討
     const targetCursusUser = cursusUsers.find(
       (cursusUser) => cursusUser.user.login === login
-    ) ?? { user: { image: { versions: { small: "" } } } };
+    );
+    // 万が一urlが存在しない場合は空文字を入れる
     const image = targetCursusUser!.user.image.versions.small ?? "";
 
     return {

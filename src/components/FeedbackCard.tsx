@@ -15,7 +15,9 @@ export const FeedbackCard = (props: { projectReview: ProjectReview }) => {
         >
           {projectReview.corrector.login}
         </Link>
-        <Text>{projectReview.final_mark}</Text>
+        <Box alignItems="right" justifyContent={"center"}>
+          <Text>{projectReview.final_mark}</Text>
+        </Box>
       </HStack>
       <Box
         bg="gray.100"
