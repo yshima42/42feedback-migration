@@ -16,7 +16,11 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
           {projectFeedback.corrector.login}
         </Link>
         <Box alignItems="right" justifyContent={"center"}>
-          <Text>{projectFeedback.final_mark}</Text>
+          {projectFeedback.final_mark >= 100 ? (
+            <Text color="green.500">{projectFeedback.final_mark}%</Text>
+          ) : (
+            <Text color="tomato">{projectFeedback.final_mark}%</Text>
+          )}
         </Box>
       </HStack>
       <Box
