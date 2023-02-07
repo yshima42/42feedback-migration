@@ -3,14 +3,12 @@ import { Heading, Image } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
-import {
-  axiosRetryInSSG,
-  fetchAccessToken,
-  fetchAllDataByAxios,
-} from "utils/functions";
+import { axiosRetryInSSG } from "utils/functions";
 import axios from "axios";
 import { CursusUser } from "types/cursusUsers";
 import { ScaleTeam } from "types/scaleTeam";
+import cursusUsers from "utils/preval/cursus-users.preval";
+import token from "utils/preval/access-token.preval";
 
 type ProjectReview = {
   id: number;
@@ -35,12 +33,6 @@ const fetchProjectReviews = async (
     },
   });
   return response.data;
-};
-
-const fetchCursusUsers = async (accessToken: string) => {
-  const url = `${API_URL}/v2/cursus/${CURSUS_ID}/cursus_users?filter[campus_id]=${CAMPUS_ID}`;
-  const response = await fetchAllDataByAxios(url, accessToken);
-  return response;
 };
 
 const makeProjectReviews = (
@@ -72,7 +64,6 @@ export const getStaticProps: GetStaticProps = async () => {
   try {
     axiosRetryInSSG();
 
-    const token = await fetchAccessToken();
     const projectId = "42cursus-libft";
 
     const scaleTeams = await fetchProjectReviews(
@@ -81,7 +72,6 @@ export const getStaticProps: GetStaticProps = async () => {
       1,
       100
     );
-    const cursusUsers = await fetchCursusUsers(token.access_token);
     const projectReviews = makeProjectReviews(scaleTeams, cursusUsers);
 
     return {

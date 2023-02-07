@@ -23,6 +23,7 @@
     "framer-motion": "^8.5.3",
     "next": "13.1.5",
     "next-auth": "^4.18.10",
+    "next-plugin-preval": "^1.2.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-paginate": "^8.1.4",
