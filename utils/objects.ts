@@ -24,6 +24,10 @@ export const cursusProjects = [
     name: "minitalk",
   },
   {
+    slug: "pipex",
+    name: "pipex",
+  },
+  {
     slug: "so_long",
     name: "so_long",
   },
