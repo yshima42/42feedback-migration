@@ -23,7 +23,9 @@ const Header: React.FC = () => {
   if (session) {
     left = (
       <Heading as="h1" fontSize={{ base: "md", md: "xl" }}>
-        <Link href="/">42Progress</Link>
+        <Link href="/">
+          <Text _hover={{ color: "gray.50" }}>42Progress</Text>
+        </Link>
       </Heading>
     );
     right = (
