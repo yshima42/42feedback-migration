@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Center, Heading, Box } from "@chakra-ui/react";
+import { Center, Box } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -37,6 +37,7 @@ const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
 };
 
 const makeProjectFeedbacks = (
+  slug: string,
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
@@ -54,12 +55,14 @@ const makeProjectFeedbacks = (
 
     return {
       id: value.id,
+      slug: slug,
       corrector: {
         login: login,
         image: image,
       },
       final_mark: value.final_mark,
       comment: value.comment,
+      projects_user_id: value.team.users[0].projects_user_id,
     };
   });
 
@@ -87,8 +90,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return { notFound: true };
   }
 
-  const projectId = context.params.id as string;
-  if (!cursusProjects.find((project) => project.slug === projectId)) {
+  const slug = context.params.id as string;
+  if (!cursusProjects.find((project) => project.slug === slug)) {
     return { notFound: true };
   }
 
@@ -96,9 +99,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
+    const scaleTeams = await fetchScaleTeams(slug, token.access_token);
 
-    const projectFeedbacks = makeProjectFeedbacks(scaleTeams, cursusUsers);
+    const projectFeedbacks = makeProjectFeedbacks(
+      slug,
+      scaleTeams,
+      cursusUsers
+    );
 
     return {
       props: { projectFeedbacks },
@@ -155,11 +162,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   return (
-    <Layout>
+    <Layout name={projectFeedbacks[0].slug}>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Heading>42Feedbacks</Heading>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate

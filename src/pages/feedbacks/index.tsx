@@ -1,12 +1,11 @@
 import { Layout } from "@/components/Layout";
 import Link from "next/link";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { cursusProjects } from "../../../utils/objects";
 
 const Feedbacks = () => {
   return (
-    <Layout>
-      <Heading>Feedbacks</Heading>
+    <Layout name="Feedbacks">
       {cursusProjects.map((cursusProject) => (
         <Box key={cursusProject.slug}>
           <Link href={`/feedbacks/${cursusProject.slug}`}>
