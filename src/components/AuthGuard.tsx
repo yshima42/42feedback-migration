@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import { Text } from "@chakra-ui/react";
 
 type AuthGuardProps = {
   children: JSX.Element;
@@ -22,8 +23,8 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
     case "authenticated":
       return children;
     case "loading":
-      return <p>Loading...</p>;
+      return <Text>Loading...</Text>;
     case "unauthenticated":
-      return <>Redirecting...</>;
+      return <Text>Redirecting...</Text>;
   }
 };
