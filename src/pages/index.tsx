@@ -5,7 +5,7 @@ import { cursusProjects } from "../../utils/objects";
 
 const Home = () => {
   return (
-    <Layout name="Feedbacks">
+    <Layout name="">
       {cursusProjects.map((cursusProject) => (
         <Box key={cursusProject.slug}>
           <Link href={`/${cursusProject.slug}`}>{cursusProject.name}</Link>
