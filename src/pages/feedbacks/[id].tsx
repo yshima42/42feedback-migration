@@ -13,6 +13,7 @@ import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
 import { ScaleTeam } from "types/scaleTeam";
+import escapeStringRegexp from "escape-string-regexp";
 
 const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
@@ -166,9 +167,13 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("handleInputChange");
     const newSearchedProjectFeedbacks = projectFeedbacks.filter(
-      (projectFeedback) => projectFeedback.comment.includes(event.target.value)
+      (projectFeedback) => {
+        // 入力された文字列を安全に正規表現に変換
+        const escapedText = escapeStringRegexp(event.target.value);
+        const regex = new RegExp(escapedText, "i");
+        return projectFeedback.comment.match(regex);
+      }
     );
     setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
     setItemOffset(0);
