@@ -1,16 +1,17 @@
-import { Inter } from "@next/font/google";
-import { Layout } from "@/components/Layout";
 import Link from "next/link";
-import { Heading } from "@chakra-ui/react";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Layout } from "@/components/Layout";
+import { Box } from "@chakra-ui/react";
+import { cursusProjects } from "../../utils/objects";
 
 const Home = () => {
   return (
-    <Layout name="42 Progress">
-      <Link href="/same-grade">same grade progress(名前ダサいから変える)</Link>
-      <br />
-      <Link href="/feedbacks">feedbacks</Link>
+    <Layout name="">
+      {cursusProjects.map((cursusProject) => (
+        <Box key={cursusProject.slug}>
+          <Link href={`/${cursusProject.slug}`}>{cursusProject.name}</Link>
+          <br />
+        </Box>
+      ))}
     </Layout>
   );
 };
