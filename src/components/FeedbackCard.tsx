@@ -13,6 +13,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
         <Text fontSize="md">Evaluated by</Text>
         <Link
           href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
+          target="_blank"
         >
           {projectFeedback.corrector.login}
         </Link>
@@ -26,6 +27,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
         <Flex justifyContent="right">
           <Link
             href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
+            target="_blank"
           >
             <HStack>
               <Text fontSize="md">intra</Text>
