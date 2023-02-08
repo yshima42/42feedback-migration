@@ -7,9 +7,11 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const { projectFeedback } = props;
 
   return (
-    <>
-      <HStack>
+    <Box>
+      <Flex>
         <Avatar src={projectFeedback.corrector.image} />
+      </Flex>
+      <Flex>
         <Text fontSize="md">Evaluated by</Text>
         <Link
           href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
@@ -24,18 +26,16 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
             <Text color="tomato">{projectFeedback.final_mark}%</Text>
           )}
         </Box>
-        <Flex justifyContent="right">
-          <Link
-            href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
-            target="_blank"
-          >
-            <HStack>
-              <Text fontSize="md">intra</Text>
-              <ExternalLinkIcon boxSize={3} />
-            </HStack>
-          </Link>
-        </Flex>
-      </HStack>
+        <Link
+          href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
+          target="_blank"
+        >
+          <Flex alignItems="center">
+            <Text fontSize="md">intra</Text>
+            <ExternalLinkIcon boxSize={3.5} />
+          </Flex>
+        </Link>
+      </Flex>
       <Box
         bg="gray.100"
         p={4}
@@ -45,6 +45,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
       >
         {projectFeedback.comment}
       </Box>
-    </>
+    </Box>
   );
 };

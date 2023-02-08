@@ -166,7 +166,8 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Heading>Feedbacks</Heading>
+      {/* TODO: ここでslugを表示しているが、名前を表示させたい */}
+      <Heading>{projectFeedbacks[0].slug}</Heading>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate
