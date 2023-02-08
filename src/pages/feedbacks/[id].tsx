@@ -144,6 +144,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
     useState(projectFeedbacks);
   const [itemOffset, setItemOffset] = useState(0);
+  const [isComposing, setIsComposing] = useState(false);
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
   const currentItems = searchedProjectFeedbacks.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(
@@ -166,20 +167,47 @@ const PaginatedProjectFeedbacks = (props: Props) => {
     setItemOffset(newOffset);
   };
 
+  const includesSearchKeyword = (
+    projectFeedback: ProjectFeedback,
+    searchKeyword: string
+  ) => {
+    // 入力された文字列を安全に正規表現に変換
+    const escapedSearchKeyword = escapeStringRegexp(searchKeyword);
+    const regex = new RegExp(escapedSearchKeyword, "i");
+    return (
+      projectFeedback.comment.match(regex) ||
+      projectFeedback.corrector.login.match(regex)
+    );
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isComposing) {
+      return;
+    }
     const newSearchedProjectFeedbacks = projectFeedbacks.filter(
       (projectFeedback) => {
-        // 入力された文字列を安全に正規表現に変換
-        const escapedText = escapeStringRegexp(event.target.value);
-        const regex = new RegExp(escapedText, "i");
-        return (
-          projectFeedback.comment.match(regex) ||
-          projectFeedback.corrector.login.match(regex)
-        );
+        return includesSearchKeyword(projectFeedback, event.target.value);
       }
     );
     setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
     setItemOffset(0);
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = (
+    event: React.CompositionEvent<HTMLInputElement>
+  ) => {
+    const newSearchedProjectFeedbacks = projectFeedbacks.filter(
+      (projectFeedback) => {
+        return includesSearchKeyword(projectFeedback, event.data);
+      }
+    );
+    setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
+    setItemOffset(0);
+    setIsComposing(false);
   };
 
   return (
@@ -190,6 +218,8 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Input
         placeholder="intra名、またはフィードバックの内容"
         onChange={handleInputChange}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         marginBottom={4}
       />
       <ProjectFeedbacks projectFeedbacks={currentItems} />
