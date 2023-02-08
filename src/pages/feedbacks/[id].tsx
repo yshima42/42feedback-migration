@@ -57,6 +57,7 @@ const makeProjectFeedbacks = (
     return {
       id: value.id,
       slug: slug,
+      updated_at: value.updated_at,
       corrector: {
         login: login,
         image: image,

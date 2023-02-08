@@ -1,6 +1,7 @@
 export type ProjectFeedback = {
   id: number;
   slug: string;
+  updated_at: string;
   corrector: {
     login: string;
     image: string;
