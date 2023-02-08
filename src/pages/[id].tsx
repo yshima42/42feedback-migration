@@ -3,7 +3,7 @@ import { Center, Box, Input } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
-import { cursusProjects } from "../../../utils/objects";
+import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
