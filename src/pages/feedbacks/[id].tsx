@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Center, Heading, Box } from "@chakra-ui/react";
+import { Center, Box, Input } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -13,6 +13,7 @@ import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
 import { ScaleTeam } from "types/scaleTeam";
+import escapeStringRegexp from "escape-string-regexp";
 
 const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
@@ -37,6 +38,7 @@ const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
 };
 
 const makeProjectFeedbacks = (
+  slug: string,
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
@@ -54,12 +56,14 @@ const makeProjectFeedbacks = (
 
     return {
       id: value.id,
+      slug: slug,
       corrector: {
         login: login,
         image: image,
       },
       final_mark: value.final_mark,
       comment: value.comment,
+      projects_user_id: value.team.users[0].projects_user_id,
     };
   });
 
@@ -87,8 +91,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return { notFound: true };
   }
 
-  const projectId = context.params.id as string;
-  if (!cursusProjects.find((project) => project.slug === projectId)) {
+  const slug = context.params.id as string;
+  if (!cursusProjects.find((project) => project.slug === slug)) {
     return { notFound: true };
   }
 
@@ -96,9 +100,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
+    const scaleTeams = await fetchScaleTeams(slug, token.access_token);
 
-    const projectFeedbacks = makeProjectFeedbacks(scaleTeams, cursusUsers);
+    const projectFeedbacks = makeProjectFeedbacks(
+      slug,
+      scaleTeams,
+      cursusUsers
+    );
 
     return {
       props: { projectFeedbacks },
@@ -133,10 +141,14 @@ const FEEDBACKS_PER_PAGE = 20;
 const PaginatedProjectFeedbacks = (props: Props) => {
   const { projectFeedbacks } = props;
 
+  const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
+    useState(projectFeedbacks);
   const [itemOffset, setItemOffset] = useState(0);
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = projectFeedbacks.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(projectFeedbacks.length / FEEDBACKS_PER_PAGE);
+  const currentItems = searchedProjectFeedbacks.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(
+    searchedProjectFeedbacks.length / FEEDBACKS_PER_PAGE
+  );
 
   // ページ遷移時にページトップにスクロール
   // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
@@ -150,16 +162,36 @@ const PaginatedProjectFeedbacks = (props: Props) => {
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
-      (event.selected * FEEDBACKS_PER_PAGE) % projectFeedbacks.length;
+      (event.selected * FEEDBACKS_PER_PAGE) % searchedProjectFeedbacks.length;
     setItemOffset(newOffset);
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearchedProjectFeedbacks = projectFeedbacks.filter(
+      (projectFeedback) => {
+        // 入力された文字列を安全に正規表現に変換
+        const escapedText = escapeStringRegexp(event.target.value);
+        const regex = new RegExp(escapedText, "i");
+        return (
+          projectFeedback.comment.match(regex) ||
+          projectFeedback.corrector.login.match(regex)
+        );
+      }
+    );
+    setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
+    setItemOffset(0);
+  };
+
   return (
-    <Layout>
+    <Layout name={projectFeedbacks[0].slug}>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Heading>42Feedbacks</Heading>
+      <Input
+        placeholder="intra名、またはフィードバックの内容"
+        onChange={handleInputChange}
+        marginBottom={4}
+      />
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate
