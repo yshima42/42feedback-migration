@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Center, Box } from "@chakra-ui/react";
+import { Center, Box, Input } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -140,10 +140,14 @@ const FEEDBACKS_PER_PAGE = 20;
 const PaginatedProjectFeedbacks = (props: Props) => {
   const { projectFeedbacks } = props;
 
+  const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
+    useState(projectFeedbacks);
   const [itemOffset, setItemOffset] = useState(0);
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = projectFeedbacks.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(projectFeedbacks.length / FEEDBACKS_PER_PAGE);
+  const currentItems = searchedProjectFeedbacks.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(
+    searchedProjectFeedbacks.length / FEEDBACKS_PER_PAGE
+  );
 
   // ページ遷移時にページトップにスクロール
   // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
@@ -157,8 +161,17 @@ const PaginatedProjectFeedbacks = (props: Props) => {
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
-      (event.selected * FEEDBACKS_PER_PAGE) % projectFeedbacks.length;
+      (event.selected * FEEDBACKS_PER_PAGE) % searchedProjectFeedbacks.length;
     setItemOffset(newOffset);
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("handleInputChange");
+    const newSearchedProjectFeedbacks = projectFeedbacks.filter(
+      (projectFeedback) => projectFeedback.comment.includes(event.target.value)
+    );
+    setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
+    setItemOffset(0);
   };
 
   return (
@@ -166,6 +179,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
+      <Input placeholder="検索" onChange={handleInputChange} />
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate
