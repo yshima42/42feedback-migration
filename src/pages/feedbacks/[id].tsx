@@ -37,7 +37,7 @@ const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
 };
 
 const makeProjectFeedbacks = (
-  slag: string,
+  slug: string,
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
@@ -55,7 +55,7 @@ const makeProjectFeedbacks = (
 
     return {
       id: value.id,
-      slug: slag,
+      slug: slug,
       corrector: {
         login: login,
         image: image,
