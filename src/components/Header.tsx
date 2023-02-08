@@ -24,6 +24,7 @@ const Header: React.FC = () => {
     left = (
       <Heading as="h1" fontSize={{ base: "md", md: "xl" }}>
         <Link href="/">
+          {/* next/linkだとデフォルトでホバーした時に青くなってしまうので無効化 */}
           <Text _hover={{ color: "gray.50" }}>42Progress</Text>
         </Link>
       </Heading>
