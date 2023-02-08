@@ -172,7 +172,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
         // 入力された文字列を安全に正規表現に変換
         const escapedText = escapeStringRegexp(event.target.value);
         const regex = new RegExp(escapedText, "i");
-        return projectFeedback.comment.match(regex);
+        return (
+          projectFeedback.comment.match(regex) ||
+          projectFeedback.corrector.login.match(regex)
+        );
       }
     );
     setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
@@ -184,7 +187,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Input placeholder="検索" onChange={handleInputChange} />
+      <Input
+        placeholder="intra名、またはフィードバックの内容"
+        onChange={handleInputChange}
+      />
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate
