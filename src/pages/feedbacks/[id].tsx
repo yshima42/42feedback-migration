@@ -61,7 +61,6 @@ const makeProjectFeedbacks = (
         login: login,
         image: image,
       },
-      final_mark: value.final_mark,
       comment: value.comment,
       projects_user_id: value.team.users[0].projects_user_id,
     };
