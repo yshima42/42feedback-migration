@@ -22,13 +22,13 @@ const Header: React.FC = () => {
 
   if (session) {
     left = (
-      <Heading as="h1" size={{ base: "md", md: "lg" }}>
+      <Heading as="h1" fontSize={{ base: "md", md: "xl" }}>
         <Link href="/">42Progress</Link>
       </Heading>
     );
     right = (
       <Flex align="center">
-        <Box pr={4} fontSize="sm" display={{ base: "none", md: "flex" }}>
+        <Box pr={4} fontSize="xs" display={{ base: "none", md: "flex" }}>
           <Text>
             {session.user?.name} ({session.user?.email})
           </Text>
