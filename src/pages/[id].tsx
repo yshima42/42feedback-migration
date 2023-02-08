@@ -230,6 +230,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
             breakLabel="..."
             nextLabel=">"
             onPageChange={handlePageChange}
+            forcePage={itemOffset / FEEDBACKS_PER_PAGE}
             pageRangeDisplayed={5}
             pageCount={pageCount}
             previousLabel="<"
