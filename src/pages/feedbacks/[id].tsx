@@ -1,5 +1,5 @@
 import { Layout } from "@/components/Layout";
-import { Center, Heading, Box } from "@chakra-ui/react";
+import { Center, Box } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -162,12 +162,12 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   return (
-    <Layout>
+    <Layout name={projectFeedbacks[0].slug}>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
+      {/* TODO: レイアウトに入れたい*/}
       {/* TODO: ここでslugを表示しているが、名前を表示させたい */}
-      <Heading>{projectFeedbacks[0].slug}</Heading>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         <ReactPaginate

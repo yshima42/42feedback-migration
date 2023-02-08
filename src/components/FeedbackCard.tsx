@@ -1,4 +1,4 @@
-import { Avatar, Box, Flex, HStack, Text, VStack } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Spacer, Text } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { ProjectFeedback } from "types/projectFeedback";
@@ -7,34 +7,43 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const { projectFeedback } = props;
 
   return (
-    <Box>
+    <>
       <Flex>
         <Avatar src={projectFeedback.corrector.image} />
-      </Flex>
-      <Flex>
-        <Text fontSize="md">Evaluated by</Text>
-        <Link
-          href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
-          target="_blank"
-        >
-          {projectFeedback.corrector.login}
-        </Link>
-        <Box alignItems="right" justifyContent={"center"}>
-          {projectFeedback.final_mark >= 100 ? (
-            <Text color="green.500">{projectFeedback.final_mark}%</Text>
-          ) : (
-            <Text color="tomato">{projectFeedback.final_mark}%</Text>
-          )}
-        </Box>
-        <Link
-          href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
-          target="_blank"
-        >
-          <Flex alignItems="center">
-            <Text fontSize="md">intra</Text>
-            <ExternalLinkIcon boxSize={3.5} />
+        <Box alignSelf="end">
+          <Flex px="2">
+            <Text fontSize="md">Evaluated by </Text>
+            <Link
+              href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
+              target="_blank"
+            >
+              <Text px="1" fontSize="md" fontWeight="bold">
+                {projectFeedback.corrector.login}
+              </Text>
+            </Link>
           </Flex>
-        </Link>
+        </Box>
+        <Spacer />
+        <Box alignSelf="end">
+          <Flex>
+            {projectFeedback.final_mark >= 100 ? (
+              <Text px="1" color="green.500">
+                {projectFeedback.final_mark}%
+              </Text>
+            ) : (
+              <Text px="1" color="tomato">
+                {projectFeedback.final_mark}%
+              </Text>
+            )}
+            <Link
+              href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
+              target="_blank"
+            >
+              {/* <Text fontSize="md">intra</Text> */}
+              <ExternalLinkIcon boxSize={3.5} />
+            </Link>
+          </Flex>
+        </Box>
       </Flex>
       <Box
         bg="gray.100"
@@ -45,6 +54,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
       >
         {projectFeedback.comment}
       </Box>
-    </Box>
+    </>
   );
 };

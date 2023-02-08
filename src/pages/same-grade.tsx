@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { UserCountBarChartByLevel } from "@/features/same-grade/components/UserCountBarChartByLevel";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { CursusUser } from "next-auth/providers/42-school";
 import {
@@ -117,8 +117,7 @@ const SameGrade = ({ data }: Props) => {
   }
 
   return (
-    <Layout>
-      <Heading>Same Grade</Heading>
+    <Layout name="Same Grade">
       {data.map((value: BarChartInfo) => {
         return (
           <Box key={value.usersInfo.campusId}>

@@ -1,8 +1,9 @@
-import { Box, Container } from "@chakra-ui/react";
+import { Box, Container, Heading } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
 import Header from "./Header";
 
 type Props = {
+  name: string;
   children: ReactNode;
 };
 
@@ -10,7 +11,12 @@ export const Layout: React.FC<Props> = (props) => (
   <div>
     <Header />
     <Container maxW="container.xl">
-      <Box p={2}>{props.children}</Box>
+      <Box p={2}>
+        <Heading py="2" as="h2" fontSize="2xl">
+          {props.name}
+        </Heading>
+        {props.children}
+      </Box>
     </Container>
   </div>
 );
