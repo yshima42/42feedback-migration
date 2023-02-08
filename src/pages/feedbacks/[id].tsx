@@ -61,7 +61,6 @@ const makeProjectFeedbacks = (
         login: login,
         image: image,
       },
-      final_mark: value.final_mark,
       comment: value.comment,
       projects_user_id: value.team.users[0].projects_user_id,
     };
@@ -194,24 +193,28 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       />
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel=">"
-          onPageChange={handlePageChange}
-          pageRangeDisplayed={5}
-          pageCount={pageCount}
-          previousLabel="<"
-          pageClassName="page-item"
-          pageLinkClassName="page-link"
-          previousClassName="page-item"
-          previousLinkClassName="page-link"
-          nextClassName="page-item"
-          nextLinkClassName="page-link"
-          breakClassName="page-item"
-          breakLinkClassName="page-link"
-          containerClassName="pagination"
-          activeClassName="active"
-        />
+        {pageCount === 0 || pageCount == 1 ? (
+          <></>
+        ) : (
+          <ReactPaginate
+            breakLabel="..."
+            nextLabel=">"
+            onPageChange={handlePageChange}
+            pageRangeDisplayed={5}
+            pageCount={pageCount}
+            previousLabel="<"
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            breakClassName="page-item"
+            breakLinkClassName="page-link"
+            containerClassName="pagination"
+            activeClassName="active"
+          />
+        )}
       </Center>
     </Layout>
   );

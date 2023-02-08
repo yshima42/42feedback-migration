@@ -26,18 +26,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
         <Spacer />
         <Box alignSelf="end">
           <Flex>
-            <Text px="1">{projectFeedback.final_mark}%</Text>
-            {/* それぞれの課題の合格点数がわかったらこちらを追加する */}
-            {/*
-            {projectFeedback.final_mark >= 100 ? (
-              <Text px="1" color="green.500">
-                {projectFeedback.final_mark}%
-              </Text>
-            ) : (
-              <Text px="1" color="tomato">
-                {projectFeedback.final_mark}%
-              </Text>
-            )} */}
             <Link
               href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
               target="_blank"
