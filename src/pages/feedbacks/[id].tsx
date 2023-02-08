@@ -37,6 +37,7 @@ const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
 };
 
 const makeProjectFeedbacks = (
+  slag: string,
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
 ) => {
@@ -54,17 +55,14 @@ const makeProjectFeedbacks = (
 
     return {
       id: value.id,
+      slug: slag,
       corrector: {
         login: login,
         image: image,
       },
       final_mark: value.final_mark,
       comment: value.comment,
-      team: {
-        users: {
-          projects_user_id: value.team.users[0].projects_user_id,
-        },
-      },
+      projects_user_id: value.team.users[0].projects_user_id,
     };
   });
 
@@ -92,8 +90,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return { notFound: true };
   }
 
-  const projectId = context.params.id as string;
-  if (!cursusProjects.find((project) => project.slug === projectId)) {
+  const slug = context.params.id as string;
+  if (!cursusProjects.find((project) => project.slug === slug)) {
     return { notFound: true };
   }
 
@@ -101,9 +99,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
 
-    const scaleTeams = await fetchScaleTeams(projectId, token.access_token);
+    const scaleTeams = await fetchScaleTeams(slug, token.access_token);
 
-    const projectFeedbacks = makeProjectFeedbacks(scaleTeams, cursusUsers);
+    const projectFeedbacks = makeProjectFeedbacks(
+      slug,
+      scaleTeams,
+      cursusUsers
+    );
 
     return {
       props: { projectFeedbacks },
