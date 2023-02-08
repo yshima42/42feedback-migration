@@ -190,6 +190,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Input
         placeholder="intra名、またはフィードバックの内容"
         onChange={handleInputChange}
+        marginBottom={4}
       />
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
