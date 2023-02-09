@@ -3,6 +3,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
 import "bootstrap/dist/css/bootstrap.css";
+import "styles/scroll.css";
 
 const App = ({ Component, pageProps }: AppProps) => {
   return (

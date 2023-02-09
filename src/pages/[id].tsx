@@ -1,10 +1,12 @@
 import { Layout } from "@/components/Layout";
+
 import {
   Center,
   Box,
   Input,
   InputGroup,
   InputLeftElement,
+  Text
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
@@ -159,13 +161,8 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   );
 
   // ページ遷移時にページトップにスクロール
-  // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
-  // もっと良いものあるかも: https://developer.mozilla.org/ja/docs/Web/API/Window/scrollTo
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scroll(0, 0);
   }, [currentItems]);
 
   const handlePageChange = (event: { selected: number }) => {
@@ -233,8 +230,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
           onChange={handleInputChange}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
+          marginBottom={2}
         />
       </InputGroup>
+      <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (

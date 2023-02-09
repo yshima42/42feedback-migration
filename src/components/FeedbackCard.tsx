@@ -10,7 +10,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const date = new Date(projectFeedback.updated_at);
 
   return (
-    <>
+    <Box marginY={2}>
       <Flex>
         <Avatar src={projectFeedback.corrector.image} />
         <Box alignSelf="end">
@@ -50,6 +50,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
       >
         {projectFeedback.comment}
       </Box>
-    </>
+    </Box>
   );
 };
