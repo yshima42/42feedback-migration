@@ -10,7 +10,7 @@ type Props = {
   }[];
 };
 
-export const ProjectGrid: React.FC<Props> = (props) => {
+export const ProjectGrids: React.FC<Props> = (props) => {
   const { cursusProjects } = props;
 
   return (

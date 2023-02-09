@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
-import { Text, Box, Center, Wrap, WrapItem } from "@chakra-ui/react";
 import { cursusProjects } from "../../utils/objects";
-import { ProjectGrid } from "@/components/ProjectGrid";
+import { ProjectGrids } from "@/components/ProjectGrids";
 
 const Home = () => {
   return (
-    <Layout name="">
-      <ProjectGrid cursusProjects={cursusProjects} />
+    <Layout pageTitle="">
+      <ProjectGrids cursusProjects={cursusProjects} />
     </Layout>
   );
 };

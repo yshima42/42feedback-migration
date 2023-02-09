@@ -3,7 +3,7 @@ import React, { ReactNode } from "react";
 import Header from "./Header";
 
 type Props = {
-  name: string;
+  pageTitle: string;
   children: ReactNode;
 };
 
@@ -13,7 +13,7 @@ export const Layout: React.FC<Props> = (props) => (
     <Container maxW="container.xl">
       <Box p={2}>
         <Heading py="2" as="h2" fontSize="2xl">
-          {props.name}
+          {props.pageTitle}
         </Heading>
         {props.children}
       </Box>

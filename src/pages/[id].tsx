@@ -218,7 +218,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   return (
-    <Layout name={projectFeedbacks[0].slug}>
+    <Layout pageTitle={projectFeedbacks[0].slug}>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
