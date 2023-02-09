@@ -119,11 +119,6 @@ enum SortType {
   None = "None",
 }
 
-type Props = {
-  feedbacks: Feedback[];
-  projectName: string;
-};
-
 const Feedbacks = (props: { feedbacks: Feedback[] }) => {
   const { feedbacks } = props;
 
@@ -139,6 +134,21 @@ const Feedbacks = (props: { feedbacks: Feedback[] }) => {
 };
 
 const FEEDBACKS_PER_PAGE = 20;
+
+type CompareFunc = (a: Feedback, b: Feedback) => number;
+
+const sortTypeToCompareFunc = new Map<SortType, CompareFunc>([
+  [SortType.UpdateAtAsc, (a, b) => a.updated_at.localeCompare(b.updated_at)],
+  [SortType.UpdateAtDesc, (a, b) => b.updated_at.localeCompare(a.updated_at)],
+  [SortType.CommentLengthASC, (a, b) => a.comment.length - b.comment.length],
+  [SortType.CommentLengthDesc, (a, b) => b.comment.length - a.comment.length],
+  [SortType.None, (a, b) => 0],
+]);
+
+type Props = {
+  feedbacks: Feedback[];
+  projectName: string;
+};
 
 const PaginatedFeedbacks = (props: Props) => {
   const { feedbacks, projectName } = props;
@@ -160,27 +170,9 @@ const PaginatedFeedbacks = (props: Props) => {
 
   const sortFeedback = useCallback(
     (feedbacks: Feedback[], sortType: SortType) => {
-      const callback = (a: Feedback, b: Feedback) => {
-        switch (sortType) {
-          case SortType.UpdateAtAsc:
-            return (
-              new Date(a.updated_at).getTime() -
-              new Date(b.updated_at).getTime()
-            );
-          case SortType.UpdateAtDesc:
-            return (
-              new Date(b.updated_at).getTime() -
-              new Date(a.updated_at).getTime()
-            );
-          case SortType.CommentLengthASC:
-            return a.comment.length - b.comment.length;
-          case SortType.CommentLengthDesc:
-            return b.comment.length - a.comment.length;
-          case SortType.None:
-            return 0;
-        }
-      };
-      const newSortedFeedbacks = [...feedbacks].sort(callback);
+      const newSortedFeedbacks = [...feedbacks].sort(
+        sortTypeToCompareFunc.get(sortType)
+      );
       setSortedFeedbacks(newSortedFeedbacks);
     },
     []
