@@ -11,6 +11,7 @@ const Home = () => {
           key={value}
           cursusProjects={cursusProjects}
           designatedRank={value + 1}
+          marginBottom="3"
         />
       ))}
     </Layout>

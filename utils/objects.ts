@@ -71,47 +71,47 @@ export const cursusProjects = [
   },
   {
     slug: "cpp-module-00",
-    name: "cpp-module-00",
+    name: "cpp00",
     rank: 4,
   },
   {
     slug: "cpp-module-01",
-    name: "cpp-module-01",
+    name: "cpp01",
     rank: 4,
   },
   {
     slug: "cpp-module-02",
-    name: "cpp-module-02",
+    name: "cpp02",
     rank: 4,
   },
   {
     slug: "cpp-module-03",
-    name: "cpp-module-03",
+    name: "cpp03",
     rank: 4,
   },
   {
     slug: "cpp-module-04",
-    name: "cpp-module-04",
+    name: "cpp04",
     rank: 4,
   },
   {
     slug: "cpp-module-05",
-    name: "cpp-module-05",
+    name: "cpp05",
     rank: 4,
   },
   {
     slug: "cpp-module-06",
-    name: "cpp-module-06",
+    name: "cpp06",
     rank: 4,
   },
   {
     slug: "cpp-module-07",
-    name: "cpp-module-07",
+    name: "cpp07",
     rank: 4,
   },
   {
     slug: "cpp-module-08",
-    name: "cpp-module-08",
+    name: "cpp08",
     rank: 4,
   },
   {

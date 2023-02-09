@@ -83,7 +83,7 @@ export const getStaticPaths = async () => {
   const paths = cursusProjects.map((project) => {
     return {
       params: {
-        id: project.slug,
+        id: project.name,
       },
     };
   });
@@ -100,8 +100,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return { notFound: true };
   }
 
-  const slug = context.params.id as string;
-  if (!cursusProjects.find((project) => project.slug === slug)) {
+  const name = context.params.id as string;
+  const slug = cursusProjects.find((project) => project.name === name)?.slug;
+  if (!slug) {
     return { notFound: true };
   }
 
