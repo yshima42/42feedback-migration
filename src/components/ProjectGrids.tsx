@@ -16,7 +16,7 @@ export const ProjectGrids: React.FC<Props> = (props) => {
 
   return (
     <>
-      <Text fontSize="2xl" fontWeight="bold" py="2">
+      <Text fontSize="xl" fontWeight="bold" py="2">
         Rank {designatedRank}
       </Text>
       <Wrap spacing={4}>
