@@ -30,9 +30,11 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
         <Spacer />
         <Box alignSelf="end">
           <Flex>
-            <Text px="2" fontSize="sm">
-              {date.toDateString()}
-            </Text>
+            <Box alignSelf="end">
+              <Text px="2" fontSize="sm">
+                {date.toDateString()}
+              </Text>
+            </Box>
             <Link
               href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
               target="_blank"
