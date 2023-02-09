@@ -7,7 +7,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const { projectFeedback } = props;
 
   return (
-    <>
+    <Box marginY={2}>
       <Flex>
         <Avatar src={projectFeedback.corrector.image} />
         <Box alignSelf="end">
@@ -45,6 +45,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
       >
         {projectFeedback.comment}
       </Box>
-    </>
+    </Box>
   );
 };
