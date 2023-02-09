@@ -8,6 +8,7 @@ import {
   InputLeftElement,
   Text,
   Select,
+  Flex,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
@@ -265,31 +266,36 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <InputGroup size="md" marginBottom={4}>
-        <InputLeftElement
-          pointerEvents="none"
-          // eslint-disable-next-line react/no-children-prop
-          children={<SearchIcon color="gray.300" />}
-        />
-        <Input
-          placeholder="intra名、またはフィードバックの内容"
-          onChange={handleInputChange}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
-          marginBottom={2}
-        />
-      </InputGroup>
+      <Flex>
+        <InputGroup size="md" marginBottom={4}>
+          <InputLeftElement
+            pointerEvents="none"
+            // eslint-disable-next-line react/no-children-prop
+            children={<SearchIcon color="gray.300" />}
+          />
+          <Input
+            placeholder="intra名、またはフィードバックの内容"
+            onChange={handleInputChange}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
+            marginBottom={2}
+          />
+        </InputGroup>
+        <Select
+          width={200}
+          marginLeft={0.5}
+          textAlign={"center"}
+          backgroundColor={"gray.100"}
+          placeholder={"⇅ Sort"}
+          onChange={(event) => setSortType(event.target.value as SortType)}
+        >
+          <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
+          <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
+          <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
+          <option value={SortType.CommentLengthASC}>Length(Asc)</option>
+        </Select>
+      </Flex>
       <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
-      <Select
-        width={160}
-        placeholder={"Sort"}
-        onChange={(event) => setSortType(event.target.value as SortType)}
-      >
-        <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
-        <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
-        <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
-        <option value={SortType.CommentLengthASC}>Length(Asc)</option>
-      </Select>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (
