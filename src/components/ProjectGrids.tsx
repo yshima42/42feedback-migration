@@ -34,7 +34,7 @@ export const ProjectGrids: React.FC<Props> = (props) => {
                   shadow="md"
                   _hover={{ cursor: "pointer", opacity: "0.8" }}
                 > */}
-                <Button w="170px" h="40px">
+                <Button w="150px" h="150px">
                   <Center py="3">
                     <Text fontSize="lg">{cursusProject.name}</Text>
                   </Center>

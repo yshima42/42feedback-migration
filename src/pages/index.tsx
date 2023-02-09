@@ -6,11 +6,11 @@ import { ProjectGrids } from "@/components/ProjectGrids";
 const Home = () => {
   return (
     <Layout pageTitle="">
-      {[...Array(6).keys()].map((value) => (
+      {[...Array(7).keys()].map((value) => (
         <ProjectGrids
           key={value}
           cursusProjects={cursusProjects}
-          designatedRank={value + 1}
+          designatedRank={value}
           marginBottom="3"
         />
       ))}

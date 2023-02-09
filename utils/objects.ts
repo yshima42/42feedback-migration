@@ -2,7 +2,7 @@ export const cursusProjects = [
   {
     slug: "42cursus-libft",
     name: "libft",
-    rank: 1,
+    rank: 0,
   },
   {
     slug: "42cursus-ft_printf",
