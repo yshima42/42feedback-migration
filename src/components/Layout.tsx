@@ -3,20 +3,26 @@ import React, { ReactNode } from "react";
 import Header from "./Header";
 
 type Props = {
-  pageTitle: string;
+  pageTitle?: string;
   children: ReactNode;
 };
 
-export const Layout: React.FC<Props> = (props) => (
-  <div>
-    <Header />
-    <Container maxW="container.xl">
-      <Box p={2}>
-        <Heading py="2" as="h2" fontSize="2xl">
-          {props.pageTitle}
-        </Heading>
-        {props.children}
-      </Box>
-    </Container>
-  </div>
-);
+export const Layout: React.FC<Props> = (props) => {
+  const { pageTitle, children } = props;
+
+  return (
+    <div>
+      <Header />
+      <Container maxW="container.xl">
+        <Box p={2}>
+          {pageTitle && (
+            <Heading py="2" as="h2" fontSize="2xl">
+              {pageTitle}
+            </Heading>
+          )}
+          {children}
+        </Box>
+      </Container>
+    </div>
+  );
+};
