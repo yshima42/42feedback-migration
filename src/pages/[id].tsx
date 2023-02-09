@@ -274,7 +274,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
             children={<SearchIcon color="gray.300" />}
           />
           <Input
-            placeholder="intra名、またはフィードバックの内容"
+            placeholder="login or comment"
             onChange={handleInputChange}
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
