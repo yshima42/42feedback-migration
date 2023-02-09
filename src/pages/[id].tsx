@@ -14,7 +14,7 @@ import { SITE_NAME } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchScaleTeams } from "utils/functions";
-import { useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
 import { Feedback } from "types/Feedback";
@@ -150,6 +150,87 @@ type Props = {
   projectName: string;
 };
 
+const FeedbackSearchBox = ({
+  setSearchWord,
+}: {
+  setSearchWord: Dispatch<SetStateAction<string>>;
+}) => {
+  const [isComposing, setIsComposing] = useState(false);
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isComposing) {
+      return;
+    }
+    setSearchWord(event.target.value);
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = (
+    event: React.CompositionEvent<HTMLInputElement>
+  ) => {
+    setIsComposing(false);
+    setSearchWord((previous: string) => previous + event.data);
+  };
+
+  return (
+    <InputGroup size="md" marginBottom={2}>
+      <InputLeftElement pointerEvents="none">
+        <SearchIcon color="gray.300" />
+      </InputLeftElement>
+      <Input
+        placeholder="login or comment"
+        onChange={handleInputChange}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
+      />
+    </InputGroup>
+  );
+};
+
+const FeedbackSortSelect = ({
+  setSortType,
+}: {
+  setSortType: Dispatch<SetStateAction<SortType>>;
+}) => {
+  return (
+    <Select
+      width={200}
+      marginLeft={0.5}
+      textAlign={"center"}
+      backgroundColor={"gray.100"}
+      placeholder={"⇅ Sort"}
+      onChange={(event) => setSortType(event.target.value as SortType)}
+    >
+      <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
+      <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
+      <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
+      <option value={SortType.CommentLengthASC}>Length(Asc)</option>
+    </Select>
+  );
+};
+
+const FeedbackFilters = ({
+  setSearchWord,
+  setSortType,
+  feedbacksCount,
+}: {
+  setSearchWord: Dispatch<SetStateAction<string>>;
+  setSortType: Dispatch<SetStateAction<SortType>>;
+  feedbacksCount: number;
+}) => {
+  return (
+    <>
+      <Flex>
+        <FeedbackSearchBox setSearchWord={setSearchWord} />
+        <FeedbackSortSelect setSortType={setSortType} />
+      </Flex>
+      <Text opacity={0.6}>{feedbacksCount} feedbacks</Text>
+    </>
+  );
+};
+
 const PaginatedFeedbacks = (props: Props) => {
   const { feedbacks, projectName } = props;
 
@@ -157,7 +238,6 @@ const PaginatedFeedbacks = (props: Props) => {
   const [targetFeedbacks, setTargetFeedbacks] = useState(feedbacks);
   const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
   const [itemOffset, setItemOffset] = useState(0);
-  const [isComposing, setIsComposing] = useState(false);
 
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
   const currentItems = targetFeedbacks.slice(itemOffset, endOffset);
@@ -200,24 +280,6 @@ const PaginatedFeedbacks = (props: Props) => {
     setItemOffset(newOffset);
   };
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (isComposing) {
-      return;
-    }
-    setSearchWord(event.target.value);
-  };
-
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = (
-    event: React.CompositionEvent<HTMLInputElement>
-  ) => {
-    setIsComposing(false);
-    setSearchWord(searchWord + event.data);
-  };
-
   return (
     <>
       <Head>
@@ -227,33 +289,11 @@ const PaginatedFeedbacks = (props: Props) => {
         </title>
       </Head>
       <Layout pageTitle={projectName}>
-        <Flex>
-          <InputGroup size="md" marginBottom={2}>
-            <InputLeftElement pointerEvents="none">
-              <SearchIcon color="gray.300" />
-            </InputLeftElement>
-            <Input
-              placeholder="login or comment"
-              onChange={handleInputChange}
-              onCompositionStart={handleCompositionStart}
-              onCompositionEnd={handleCompositionEnd}
-            />
-          </InputGroup>
-          <Select
-            width={200}
-            marginLeft={0.5}
-            textAlign={"center"}
-            backgroundColor={"gray.100"}
-            placeholder={"⇅ Sort"}
-            onChange={(event) => setSortType(event.target.value as SortType)}
-          >
-            <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
-            <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
-            <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
-            <option value={SortType.CommentLengthASC}>Length(Asc)</option>
-          </Select>
-        </Flex>
-        <Text opacity={0.6}>{targetFeedbacks.length} feedbacks</Text>
+        <FeedbackFilters
+          setSearchWord={setSearchWord}
+          setSortType={setSortType}
+          feedbacksCount={targetFeedbacks.length}
+        />
         <Feedbacks feedbacks={currentItems} />
         <Center>
           {pageCount === 0 || pageCount == 1 ? (
