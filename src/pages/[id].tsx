@@ -109,6 +109,13 @@ const sortTypeToCompareFunc = new Map<SortType, CompareFunc>([
   [SortType.None, (a, b) => 0],
 ]);
 
+const includesSearchKeyword = (feedback: Feedback, searchWord: string) => {
+  // 入力された文字列を安全に正規表現に変換
+  const escapedSearchKeyword = escapeStringRegexp(searchWord);
+  const regex = new RegExp(escapedSearchKeyword, "i");
+  return feedback.comment.match(regex) || feedback.corrector.login.match(regex);
+};
+
 type Props = {
   feedbacks: Feedback[];
   projectName: string;
@@ -124,19 +131,9 @@ const Feedbacks = ({ feedbacks, projectName }: Props) => {
     itemOffset + FEEDBACKS_PER_PAGE
   );
 
-  // ページ遷移時にページトップにスクロール
   useEffect(() => {
     window.scroll(0, 0);
   }, [currentItems]);
-
-  const includesSearchKeyword = (feedback: Feedback, searchKeyword: string) => {
-    // 入力された文字列を安全に正規表現に変換
-    const escapedSearchKeyword = escapeStringRegexp(searchKeyword);
-    const regex = new RegExp(escapedSearchKeyword, "i");
-    return (
-      feedback.comment.match(regex) || feedback.corrector.login.match(regex)
-    );
-  };
 
   // 対象となるフィードバックを更新する
   useEffect(() => {
