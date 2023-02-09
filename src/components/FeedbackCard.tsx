@@ -39,7 +39,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
               href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
               target="_blank"
             >
-              {/* <Text fontSize="md">intra</Text> */}
               <ExternalLinkIcon boxSize={3.5} />
             </Link>
           </Flex>
