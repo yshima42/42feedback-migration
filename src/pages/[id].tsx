@@ -153,64 +153,58 @@ type Props = {
 const PaginatedFeedbacks = (props: Props) => {
   const { feedbacks, projectName } = props;
 
-  const [searchedFeedbacks, setSearchedFeedbacks] = useState(feedbacks);
-  const [sortedFeedbacks, setSortedFeedbacks] = useState(feedbacks);
+  const [searchWord, setSearchWord] = useState("");
+  const [targetFeedbacks, setTargetFeedbacks] = useState(feedbacks);
   const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
   const [itemOffset, setItemOffset] = useState(0);
   const [isComposing, setIsComposing] = useState(false);
 
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = sortedFeedbacks.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(searchedFeedbacks.length / FEEDBACKS_PER_PAGE);
+  const currentItems = targetFeedbacks.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(targetFeedbacks.length / FEEDBACKS_PER_PAGE);
 
   // ページ遷移時にページトップにスクロール
   useEffect(() => {
     window.scroll(0, 0);
   }, [currentItems]);
 
-  const sortFeedback = useCallback(
-    (feedbacks: Feedback[], sortType: SortType) => {
-      const newSortedFeedbacks = [...feedbacks].sort(
-        sortTypeToCompareFunc.get(sortType)
-      );
-      setSortedFeedbacks(newSortedFeedbacks);
-    },
-    []
-  );
-
-  // ソートを管理
-  useEffect(() => {
-    sortFeedback(searchedFeedbacks, sortType);
-  }, [searchedFeedbacks, sortFeedback, sortType]);
-
-  const handlePageChange = (event: { selected: number }) => {
-    const newOffset =
-      (event.selected * FEEDBACKS_PER_PAGE) % searchedFeedbacks.length;
-    setItemOffset(newOffset);
-  };
-
-  const includesSearchKeyword = (
-    projectFeedback: Feedback,
-    searchKeyword: string
-  ) => {
+  const includesSearchKeyword = (feedback: Feedback, searchKeyword: string) => {
     // 入力された文字列を安全に正規表現に変換
     const escapedSearchKeyword = escapeStringRegexp(searchKeyword);
     const regex = new RegExp(escapedSearchKeyword, "i");
     return (
-      projectFeedback.comment.match(regex) ||
-      projectFeedback.corrector.login.match(regex)
+      feedback.comment.match(regex) || feedback.corrector.login.match(regex)
     );
+  };
+
+  // 対象となるフィードバックを更新する
+  useEffect(() => {
+    console.log("update searchedFeedbacks");
+    console.log("searchWord: ", searchWord);
+    // 検索ワードでフィルタリング
+    const searchedFeedbacks = feedbacks.filter((feedback) =>
+      includesSearchKeyword(feedback, searchWord)
+    );
+    // フィルタリング後のフィードバックをソート
+    const sortedFeedbacks = searchedFeedbacks.sort(
+      sortTypeToCompareFunc.get(sortType)
+    );
+    // 更新
+    setTargetFeedbacks(sortedFeedbacks);
+    // 対象となるフィードバックが変わったらページを先頭に戻す
+    setItemOffset(0);
+  }, [sortType, searchWord, feedbacks]);
+
+  const handlePageChange = (event: { selected: number }) => {
+    const newOffset = (event.selected * FEEDBACKS_PER_PAGE) % feedbacks.length;
+    setItemOffset(newOffset);
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (isComposing) {
       return;
     }
-    const newSearchedFeedbacks = feedbacks.filter((projectFeedback) => {
-      return includesSearchKeyword(projectFeedback, event.target.value);
-    });
-    setSearchedFeedbacks(newSearchedFeedbacks);
-    setItemOffset(0);
+    setSearchWord(event.target.value);
   };
 
   const handleCompositionStart = () => {
@@ -220,12 +214,8 @@ const PaginatedFeedbacks = (props: Props) => {
   const handleCompositionEnd = (
     event: React.CompositionEvent<HTMLInputElement>
   ) => {
-    const newSearchedFeedbacks = feedbacks.filter((projectFeedback) => {
-      return includesSearchKeyword(projectFeedback, event.data);
-    });
-    setSearchedFeedbacks(newSearchedFeedbacks);
-    setItemOffset(0);
     setIsComposing(false);
+    setSearchWord(searchWord + event.data);
   };
 
   return (
@@ -263,7 +253,7 @@ const PaginatedFeedbacks = (props: Props) => {
             <option value={SortType.CommentLengthASC}>Length(Asc)</option>
           </Select>
         </Flex>
-        <Text opacity={0.6}>{searchedFeedbacks.length} feedbacks</Text>
+        <Text opacity={0.6}>{targetFeedbacks.length} feedbacks</Text>
         <Feedbacks feedbacks={currentItems} />
         <Center>
           {pageCount === 0 || pageCount == 1 ? (
