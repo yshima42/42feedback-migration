@@ -1,4 +1,4 @@
-export type ProjectFeedback = {
+export type Feedback = {
   id: number;
   slug: string;
   updated_at: string;

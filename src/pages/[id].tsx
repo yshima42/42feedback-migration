@@ -17,7 +17,7 @@ import { axiosRetryInSSG, fetchScaleTeams } from "utils/functions";
 import { useCallback, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
-import { ProjectFeedback } from "types/projectFeedback";
+import { Feedback } from "types/Feedback";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
@@ -37,7 +37,7 @@ const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
   return false;
 };
 
-const makeProjectFeedbacks = (
+const makeFeedbacks = (
   slug: string,
   scaleTeams: ScaleTeam[],
   cursusUsers: CursusUser[]
@@ -99,14 +99,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     axiosRetryInSSG();
     const scaleTeams = await fetchScaleTeams(slug, token.access_token);
-    const projectFeedbacks = makeProjectFeedbacks(
-      slug,
-      scaleTeams,
-      cursusUsers
-    );
+    const feedbacks = makeFeedbacks(slug, scaleTeams, cursusUsers);
 
     return {
-      props: { projectFeedbacks, projectName: name },
+      props: { feedbacks, projectName: name },
       revalidate: 60 * 60,
     };
   } catch (error) {
@@ -124,18 +120,18 @@ enum SortType {
 }
 
 type Props = {
-  projectFeedbacks: ProjectFeedback[];
+  feedbacks: Feedback[];
   projectName: string;
 };
 
-const ProjectFeedbacks = (props: { projectFeedbacks: ProjectFeedback[] }) => {
-  const { projectFeedbacks } = props;
+const Feedbacks = (props: { feedbacks: Feedback[] }) => {
+  const { feedbacks } = props;
 
   return (
     <>
-      {projectFeedbacks.map((projectFeedback: ProjectFeedback) => (
+      {feedbacks.map((projectFeedback: Feedback) => (
         <Box key={projectFeedback.id} mb={8}>
-          <FeedbackCard projectFeedback={projectFeedback} />
+          <FeedbackCard feedback={projectFeedback} />
         </Box>
       ))}
     </>
@@ -144,22 +140,18 @@ const ProjectFeedbacks = (props: { projectFeedbacks: ProjectFeedback[] }) => {
 
 const FEEDBACKS_PER_PAGE = 20;
 
-const PaginatedProjectFeedbacks = (props: Props) => {
-  const { projectFeedbacks, projectName } = props;
+const PaginatedFeedbacks = (props: Props) => {
+  const { feedbacks, projectName } = props;
 
-  const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
-    useState(projectFeedbacks);
-  const [sortedProjectFeedbacks, setSortedProjectFeedbacks] =
-    useState(projectFeedbacks);
+  const [searchedFeedbacks, setSearchedFeedbacks] = useState(feedbacks);
+  const [sortedFeedbacks, setSortedFeedbacks] = useState(feedbacks);
   const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
   const [itemOffset, setItemOffset] = useState(0);
   const [isComposing, setIsComposing] = useState(false);
 
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = sortedProjectFeedbacks.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(
-    searchedProjectFeedbacks.length / FEEDBACKS_PER_PAGE
-  );
+  const currentItems = sortedFeedbacks.slice(itemOffset, endOffset);
+  const pageCount = Math.ceil(searchedFeedbacks.length / FEEDBACKS_PER_PAGE);
 
   // ページ遷移時にページトップにスクロール
   useEffect(() => {
@@ -167,8 +159,8 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   }, [currentItems]);
 
   const sortFeedback = useCallback(
-    (feedbacks: ProjectFeedback[], sortType: SortType) => {
-      const callback = (a: ProjectFeedback, b: ProjectFeedback) => {
+    (feedbacks: Feedback[], sortType: SortType) => {
+      const callback = (a: Feedback, b: Feedback) => {
         switch (sortType) {
           case SortType.UpdateAtAsc:
             return (
@@ -188,25 +180,25 @@ const PaginatedProjectFeedbacks = (props: Props) => {
             return 0;
         }
       };
-      const newSortedProjectFeedbacks = [...feedbacks].sort(callback);
-      setSortedProjectFeedbacks(newSortedProjectFeedbacks);
+      const newSortedFeedbacks = [...feedbacks].sort(callback);
+      setSortedFeedbacks(newSortedFeedbacks);
     },
     []
   );
 
   // ソートを管理
   useEffect(() => {
-    sortFeedback(searchedProjectFeedbacks, sortType);
-  }, [searchedProjectFeedbacks, sortFeedback, sortType]);
+    sortFeedback(searchedFeedbacks, sortType);
+  }, [searchedFeedbacks, sortFeedback, sortType]);
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
-      (event.selected * FEEDBACKS_PER_PAGE) % searchedProjectFeedbacks.length;
+      (event.selected * FEEDBACKS_PER_PAGE) % searchedFeedbacks.length;
     setItemOffset(newOffset);
   };
 
   const includesSearchKeyword = (
-    projectFeedback: ProjectFeedback,
+    projectFeedback: Feedback,
     searchKeyword: string
   ) => {
     // 入力された文字列を安全に正規表現に変換
@@ -222,12 +214,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
     if (isComposing) {
       return;
     }
-    const newSearchedProjectFeedbacks = projectFeedbacks.filter(
-      (projectFeedback) => {
-        return includesSearchKeyword(projectFeedback, event.target.value);
-      }
-    );
-    setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
+    const newSearchedFeedbacks = feedbacks.filter((projectFeedback) => {
+      return includesSearchKeyword(projectFeedback, event.target.value);
+    });
+    setSearchedFeedbacks(newSearchedFeedbacks);
     setItemOffset(0);
   };
 
@@ -238,12 +228,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   const handleCompositionEnd = (
     event: React.CompositionEvent<HTMLInputElement>
   ) => {
-    const newSearchedProjectFeedbacks = projectFeedbacks.filter(
-      (projectFeedback) => {
-        return includesSearchKeyword(projectFeedback, event.data);
-      }
-    );
-    setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
+    const newSearchedFeedbacks = feedbacks.filter((projectFeedback) => {
+      return includesSearchKeyword(projectFeedback, event.data);
+    });
+    setSearchedFeedbacks(newSearchedFeedbacks);
     setItemOffset(0);
     setIsComposing(false);
   };
@@ -283,8 +271,8 @@ const PaginatedProjectFeedbacks = (props: Props) => {
             <option value={SortType.CommentLengthASC}>Length(Asc)</option>
           </Select>
         </Flex>
-        <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
-        <ProjectFeedbacks projectFeedbacks={currentItems} />
+        <Text opacity={0.6}>{searchedFeedbacks.length} feedbacks</Text>
+        <Feedbacks feedbacks={currentItems} />
         <Center>
           {pageCount === 0 || pageCount == 1 ? (
             <></>
@@ -315,4 +303,4 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   );
 };
 
-export default PaginatedProjectFeedbacks;
+export default PaginatedFeedbacks;
