@@ -8,31 +8,39 @@ type Props = {
     slug: string;
     rank: number;
   }[];
+  designatedRank: number;
 };
 
 export const ProjectGrids: React.FC<Props> = (props) => {
-  const { cursusProjects } = props;
+  const { cursusProjects, designatedRank } = props;
 
   return (
-    <Wrap spacing={4}>
-      {cursusProjects.map((cursusProject) => (
-        <WrapItem key={cursusProject.slug}>
-          <Link href={`/${cursusProject.slug}`}>
-            <Box
-              w="160px"
-              h="160px"
-              bg="gray.200"
-              borderRadius="10px"
-              shadow="md"
-              _hover={{ cursor: "pointer", opacity: "0.8" }}
-            >
-              <Center py="10">
-                <Text fontSize="xl">{cursusProject.name}</Text>
-              </Center>
-            </Box>
-          </Link>
-        </WrapItem>
-      ))}
-    </Wrap>
+    <>
+      <Text fontSize="2xl" fontWeight="bold" py="2">
+        Rank {designatedRank}
+      </Text>
+      <Wrap spacing={4}>
+        {cursusProjects
+          .filter((value) => value.rank === designatedRank)
+          .map((cursusProject) => (
+            <WrapItem key={cursusProject.slug}>
+              <Link href={`/${cursusProject.slug}`}>
+                <Box
+                  w="160px"
+                  h="160px"
+                  bg="gray.200"
+                  borderRadius="10px"
+                  shadow="md"
+                  _hover={{ cursor: "pointer", opacity: "0.8" }}
+                >
+                  <Center py="10">
+                    <Text fontSize="lg">{cursusProject.name}</Text>
+                  </Center>
+                </Box>
+              </Link>
+            </WrapItem>
+          ))}
+      </Wrap>
+    </>
   );
 };
