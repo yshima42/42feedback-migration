@@ -1,6 +1,6 @@
-import { Box, Button, Center, Text, Wrap, WrapItem } from "@chakra-ui/react";
+import { Box, Button, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import React from "react";
 
 type Props = {
   cursusProjects: {

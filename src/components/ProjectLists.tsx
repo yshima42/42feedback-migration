@@ -1,6 +1,6 @@
 import { Box, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import React from "react";
 
 type Props = {
   cursusProjects: {
@@ -26,7 +26,7 @@ export const ProjectLists: React.FC<Props> = (props) => {
             <ListItem key={cursusProject.name}>
               <Link href={`/${cursusProject.name}`}>
                 <Text color="blue.500" fontSize="lg">
-                  <a className="">{cursusProject.name}</a>
+                  <a>{cursusProject.name}</a>
                 </Text>
               </Link>
             </ListItem>
