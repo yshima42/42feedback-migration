@@ -204,11 +204,11 @@ const FeedbackSortSelect = ({
 const FeedbackFilters = ({
   setSearchWord,
   setSortType,
-  feedbacksCount,
+  feedbackCount,
 }: {
   setSearchWord: Dispatch<SetStateAction<string>>;
   setSortType: Dispatch<SetStateAction<SortType>>;
-  feedbacksCount: number;
+  feedbackCount: number;
 }) => {
   return (
     <>
@@ -216,25 +216,25 @@ const FeedbackFilters = ({
         <FeedbackSearchBox setSearchWord={setSearchWord} />
         <FeedbackSortSelect setSortType={setSortType} />
       </Flex>
-      <Text opacity={0.6}>{feedbacksCount} feedbacks</Text>
+      <Text opacity={0.6}>{feedbackCount} feedbacks</Text>
     </>
   );
 };
 
 const FeedbackPagination = ({
-  feedbacksCount,
-  targetFeedbacksCount,
+  feedbackCount,
+  targetFeedbackCount,
   itemOffset,
   setItemOffset,
 }: {
-  feedbacksCount: number;
-  targetFeedbacksCount: number;
+  feedbackCount: number;
+  targetFeedbackCount: number;
   itemOffset: number;
   setItemOffset: Dispatch<SetStateAction<number>>;
 }) => {
-  const pageCount = Math.ceil(targetFeedbacksCount / FEEDBACKS_PER_PAGE);
+  const pageCount = Math.ceil(targetFeedbackCount / FEEDBACKS_PER_PAGE);
   const handlePageChange = (event: { selected: number }) => {
-    const newOffset = (event.selected * FEEDBACKS_PER_PAGE) % feedbacksCount;
+    const newOffset = (event.selected * FEEDBACKS_PER_PAGE) % feedbackCount;
     setItemOffset(newOffset);
   };
   const isPaginationDisabled = pageCount <= 1;
@@ -296,8 +296,6 @@ const PaginatedFeedbacks = (props: Props) => {
 
   // 対象となるフィードバックを更新する
   useEffect(() => {
-    console.log("update searchedFeedbacks");
-    console.log("searchWord: ", searchWord);
     // 検索ワードでフィルタリング
     const searchedFeedbacks = feedbacks.filter((feedback) =>
       includesSearchKeyword(feedback, searchWord)
@@ -308,7 +306,7 @@ const PaginatedFeedbacks = (props: Props) => {
     );
     // 更新
     setTargetFeedbacks(sortedFeedbacks);
-    // 対象となるフィードバックが変わったらページを先頭に戻す
+    // 更新後、ページを先頭に戻す
     setItemOffset(0);
   }, [sortType, searchWord, feedbacks]);
 
@@ -324,12 +322,12 @@ const PaginatedFeedbacks = (props: Props) => {
         <FeedbackFilters
           setSearchWord={setSearchWord}
           setSortType={setSortType}
-          feedbacksCount={targetFeedbacks.length}
+          feedbackCount={targetFeedbacks.length}
         />
         <Feedbacks feedbacks={currentItems} />
         <FeedbackPagination
-          feedbacksCount={feedbacks.length}
-          targetFeedbacksCount={targetFeedbacks.length}
+          feedbackCount={feedbacks.length}
+          targetFeedbackCount={targetFeedbacks.length}
           itemOffset={itemOffset}
           setItemOffset={setItemOffset}
         />
