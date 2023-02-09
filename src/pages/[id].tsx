@@ -1,11 +1,19 @@
 import { Layout } from "@/components/Layout";
-import { Center, Box, Input, Button } from "@chakra-ui/react";
+import {
+  Center,
+  Box,
+  Input,
+  Button,
+  Radio,
+  RadioGroup,
+  Stack,
+} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
 import { ProjectFeedback } from "types/projectFeedback";
@@ -117,6 +125,12 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 };
 
+enum SortType {
+  CommentLengthASC = "CommentLengthASC",
+  CommentLengthDesc = "CommentLengthDesc",
+  None = "None",
+}
+
 type Props = {
   projectFeedbacks: ProjectFeedback[];
 };
@@ -142,10 +156,14 @@ const PaginatedProjectFeedbacks = (props: Props) => {
 
   const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
     useState(projectFeedbacks);
+  const [sortedProjectFeedbacks, setSortedProjectFeedbacks] =
+    useState(projectFeedbacks);
+  const [sortType, setSortType] = useState(SortType.None);
   const [itemOffset, setItemOffset] = useState(0);
   const [isComposing, setIsComposing] = useState(false);
+
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = searchedProjectFeedbacks.slice(itemOffset, endOffset);
+  const currentItems = sortedProjectFeedbacks.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(
     searchedProjectFeedbacks.length / FEEDBACKS_PER_PAGE
   );
@@ -154,6 +172,29 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   useEffect(() => {
     window.scroll(0, 0);
   }, [currentItems]);
+
+  const sortFeedback = useCallback(
+    (feedbacks: ProjectFeedback[], sortType: SortType) => {
+      const callback = (a: ProjectFeedback, b: ProjectFeedback) => {
+        switch (sortType) {
+          case SortType.CommentLengthASC:
+            return a.comment.length - b.comment.length;
+          case SortType.CommentLengthDesc:
+            return b.comment.length - a.comment.length;
+          case SortType.None:
+            return 0;
+        }
+      };
+      const newSortedProjectFeedbacks = [...feedbacks].sort(callback);
+      setSortedProjectFeedbacks(newSortedProjectFeedbacks);
+    },
+    []
+  );
+
+  // ソートを管理
+  useEffect(() => {
+    sortFeedback(searchedProjectFeedbacks, sortType);
+  }, [searchedProjectFeedbacks, sortFeedback, sortType]);
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
@@ -209,6 +250,16 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
+      <RadioGroup
+        onChange={(value) => setSortType(value as SortType)}
+        value={sortType}
+      >
+        <Stack direction="row" spacing={4} marginBottom={4}>
+          <Radio value={SortType.None}>Default</Radio>
+          <Radio value={SortType.CommentLengthASC}>Length(Asc)</Radio>
+          <Radio value={SortType.CommentLengthDesc}>Length(Desc)</Radio>
+        </Stack>
+      </RadioGroup>
       <Input
         placeholder="intra名、またはフィードバックの内容"
         onChange={handleInputChange}
