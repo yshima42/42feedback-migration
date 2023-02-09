@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 
 const Header: React.FC = () => {
   const { data: session, status } = useSession();
@@ -32,9 +32,7 @@ const Header: React.FC = () => {
     right = (
       <Flex align="center">
         <Box pr={4} fontSize="xs" display={{ base: "none", md: "flex" }}>
-          <Text>
-            {session.user?.name} ({session.user?.email})
-          </Text>
+          <Avatar src={session.user?.image ?? ""} size="sm" />
         </Box>
         <Button
           colorScheme="gray"

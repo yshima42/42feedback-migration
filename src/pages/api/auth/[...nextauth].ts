@@ -3,7 +3,9 @@ import NextAuth from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 import { DefaultJWT, JWT } from "next-auth/jwt";
 import { Account, DefaultSession, Profile, Session, User } from "next-auth";
-import FortyTwoProvider from "next-auth/providers/42-school";
+import FortyTwoProvider, {
+  FortyTwoProfile,
+} from "next-auth/providers/42-school";
 
 declare module "next-auth" {
   interface Session extends DefaultSession {
@@ -38,6 +40,12 @@ const options = {
     FortyTwoProvider({
       clientId: process.env.FORTY_TWO_CLIENT_ID as string,
       clientSecret: process.env.FORTY_TWO_CLIENT_SECRET as string,
+      profile(profile: FortyTwoProfile) {
+        return {
+          id: profile.login,
+          image: profile.image?.versions?.small,
+        };
+      },
     }),
   ],
   secret: process.env.SECRET,
