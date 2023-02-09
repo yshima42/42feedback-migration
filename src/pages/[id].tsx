@@ -11,7 +11,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
-import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
+import { API_URL, CAMPUS_ID, CURSUS_ID, SITE_NAME } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
@@ -266,6 +266,9 @@ const PaginatedProjectFeedbacks = (props: Props) => {
     <>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
+        <title>
+          {projectFeedbacks[0].slug} - {SITE_NAME}
+        </title>
       </Head>
       <Layout pageTitle={projectFeedbacks[0].slug}>
         <Flex>
