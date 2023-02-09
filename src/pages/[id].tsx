@@ -1,5 +1,11 @@
 import { Layout } from "@/components/Layout";
-import { Center, Box, Input, Button } from "@chakra-ui/react";
+import {
+  Center,
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
@@ -14,6 +20,7 @@ import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
 import { ScaleTeam } from "types/scaleTeam";
 import escapeStringRegexp from "escape-string-regexp";
+import { SearchIcon } from "@chakra-ui/icons";
 
 const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
@@ -57,6 +64,7 @@ const makeProjectFeedbacks = (
     return {
       id: value.id,
       slug: slug,
+      updated_at: value.updated_at,
       corrector: {
         login: login,
         image: image,
@@ -209,13 +217,19 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Input
-        placeholder="intra名、またはフィードバックの内容"
-        onChange={handleInputChange}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-        marginBottom={4}
-      />
+      <InputGroup size="md" marginBottom={4}>
+        <InputLeftElement
+          pointerEvents="none"
+          // eslint-disable-next-line react/no-children-prop
+          children={<SearchIcon color="gray.300" />}
+        />
+        <Input
+          placeholder="intra名、またはフィードバックの内容"
+          onChange={handleInputChange}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
+        />
+      </InputGroup>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (

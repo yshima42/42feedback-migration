@@ -6,6 +6,9 @@ import { ProjectFeedback } from "types/projectFeedback";
 export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const { projectFeedback } = props;
 
+  // propsとしてDate型を渡すと、errorになるので、stringとして取ってきている
+  const date = new Date(projectFeedback.updated_at);
+
   return (
     <>
       <Flex>
@@ -21,6 +24,9 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
                 {projectFeedback.corrector.login}
               </Text>
             </Link>
+            <Box alignSelf="end" px="1">
+              <Text fontSize="sm">{date.toDateString()}</Text>
+            </Box>
           </Flex>
         </Box>
         <Spacer />
@@ -30,7 +36,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
               href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
               target="_blank"
             >
-              {/* <Text fontSize="md">intra</Text> */}
               <ExternalLinkIcon boxSize={3.5} />
             </Link>
           </Flex>
