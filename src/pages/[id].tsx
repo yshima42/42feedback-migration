@@ -285,12 +285,13 @@ const PaginatedProjectFeedbacks = (props: Props) => {
             />
           </InputGroup>
           <Select
-            width={200}
+            width={170}
             marginLeft={0.5}
             textAlign={"center"}
             backgroundColor={"gray.100"}
             placeholder={"⇅ Sort"}
             onChange={(event) => setSortType(event.target.value as SortType)}
+            fontSize={"sm"}
           >
             <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
             <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
