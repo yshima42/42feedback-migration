@@ -231,6 +231,53 @@ const FeedbackFilters = ({
   );
 };
 
+const FeedbackPagination = ({
+  feedbacksCount,
+  targetFeedbacksCount,
+  itemOffset,
+  setItemOffset,
+}: {
+  feedbacksCount: number;
+  targetFeedbacksCount: number;
+  itemOffset: number;
+  setItemOffset: Dispatch<SetStateAction<number>>;
+}) => {
+  const pageCount = Math.ceil(targetFeedbacksCount / FEEDBACKS_PER_PAGE);
+  const handlePageChange = (event: { selected: number }) => {
+    const newOffset = (event.selected * FEEDBACKS_PER_PAGE) % feedbacksCount;
+    setItemOffset(newOffset);
+  };
+  const isPaginationDisabled = pageCount <= 1;
+
+  return (
+    <Center>
+      {isPaginationDisabled ? (
+        <></>
+      ) : (
+        <ReactPaginate
+          breakLabel="..."
+          nextLabel=">"
+          onPageChange={handlePageChange}
+          forcePage={itemOffset / FEEDBACKS_PER_PAGE}
+          pageRangeDisplayed={5}
+          pageCount={pageCount}
+          previousLabel="<"
+          pageClassName="page-item"
+          pageLinkClassName="page-link"
+          previousClassName="page-item"
+          previousLinkClassName="page-link"
+          nextClassName="page-item"
+          nextLinkClassName="page-link"
+          breakClassName="page-item"
+          breakLinkClassName="page-link"
+          containerClassName="pagination"
+          activeClassName="active"
+        />
+      )}
+    </Center>
+  );
+};
+
 const PaginatedFeedbacks = (props: Props) => {
   const { feedbacks, projectName } = props;
 
@@ -238,10 +285,10 @@ const PaginatedFeedbacks = (props: Props) => {
   const [targetFeedbacks, setTargetFeedbacks] = useState(feedbacks);
   const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
   const [itemOffset, setItemOffset] = useState(0);
-
-  const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = targetFeedbacks.slice(itemOffset, endOffset);
-  const pageCount = Math.ceil(targetFeedbacks.length / FEEDBACKS_PER_PAGE);
+  const currentItems = targetFeedbacks.slice(
+    itemOffset,
+    itemOffset + FEEDBACKS_PER_PAGE
+  );
 
   // ページ遷移時にページトップにスクロール
   useEffect(() => {
@@ -275,11 +322,6 @@ const PaginatedFeedbacks = (props: Props) => {
     setItemOffset(0);
   }, [sortType, searchWord, feedbacks]);
 
-  const handlePageChange = (event: { selected: number }) => {
-    const newOffset = (event.selected * FEEDBACKS_PER_PAGE) % feedbacks.length;
-    setItemOffset(newOffset);
-  };
-
   return (
     <>
       <Head>
@@ -295,31 +337,12 @@ const PaginatedFeedbacks = (props: Props) => {
           feedbacksCount={targetFeedbacks.length}
         />
         <Feedbacks feedbacks={currentItems} />
-        <Center>
-          {pageCount === 0 || pageCount == 1 ? (
-            <></>
-          ) : (
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel=">"
-              onPageChange={handlePageChange}
-              forcePage={itemOffset / FEEDBACKS_PER_PAGE}
-              pageRangeDisplayed={5}
-              pageCount={pageCount}
-              previousLabel="<"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              containerClassName="pagination"
-              activeClassName="active"
-            />
-          )}
-        </Center>
+        <FeedbackPagination
+          feedbacksCount={feedbacks.length}
+          targetFeedbacksCount={targetFeedbacks.length}
+          itemOffset={itemOffset}
+          setItemOffset={setItemOffset}
+        />
       </Layout>
     </>
   );
