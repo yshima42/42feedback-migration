@@ -221,11 +221,9 @@ const PaginatedProjectFeedbacks = (props: Props) => {
         <meta name="robots" content="noindex,nofollow" />
       </Head>
       <InputGroup size="md" marginBottom={1}>
-        <InputLeftElement
-          pointerEvents="none"
-          // eslint-disable-next-line react/no-children-prop
-          children={<SearchIcon color="gray.300" />}
-        />
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color="gray.300" />
+        </InputLeftElement>
         <Input
           placeholder="intra名、またはフィードバックの内容"
           onChange={handleInputChange}

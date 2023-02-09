@@ -34,7 +34,7 @@ export const ProjectLists: React.FC<Props> = (props) => {
             <ListItem key={cursusProject.name}>
               <Link href={`/${cursusProject.name}`}>
                 <Text color="blue.500" fontSize="lg">
-                  {cursusProject.name}
+                  <a>{cursusProject.name}</a>
                 </Text>
               </Link>
             </ListItem>
