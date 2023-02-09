@@ -25,16 +25,14 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
                 {projectFeedback.corrector.login}
               </Text>
             </Link>
+            <Box alignSelf="end" px="1">
+              <Text fontSize="sm">{date.toDateString()}</Text>
+            </Box>
           </Flex>
         </Box>
         <Spacer />
         <Box alignSelf="end">
           <Flex>
-            <Box alignSelf="end">
-              <Text px="2" fontSize="sm">
-                {date.toDateString()}
-              </Text>
-            </Box>
             <Link
               href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
               target="_blank"
