@@ -10,14 +10,14 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
-import { SITE_NAME } from "utils/constants";
+import { SITE_NAME, FEEDBACKS_PER_PAGE } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchScaleTeams } from "utils/functions";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
-import { Feedback } from "types/Feedback";
+import { Feedback, SortType } from "types/Feedback";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
@@ -111,14 +111,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 };
 
-enum SortType {
-  UpdateAtAsc = "UpdateAtAsc",
-  UpdateAtDesc = "UpdateAtDesc",
-  CommentLengthASC = "CommentLengthASC",
-  CommentLengthDesc = "CommentLengthDesc",
-  None = "None",
-}
-
 const Feedbacks = (props: { feedbacks: Feedback[] }) => {
   const { feedbacks } = props;
 
@@ -132,8 +124,6 @@ const Feedbacks = (props: { feedbacks: Feedback[] }) => {
     </>
   );
 };
-
-const FEEDBACKS_PER_PAGE = 20;
 
 type CompareFunc = (a: Feedback, b: Feedback) => number;
 

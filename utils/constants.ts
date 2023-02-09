@@ -6,3 +6,5 @@ export const CAMPUS_ID_SEOUL = 29;
 export const CAMPUS_ID_PARIS = 1;
 
 export const SITE_NAME = "42 Feedback";
+
+export const FEEDBACKS_PER_PAGE = 20;
