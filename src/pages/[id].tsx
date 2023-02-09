@@ -6,7 +6,7 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Text
+  Text,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
@@ -219,7 +219,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <InputGroup size="md" marginBottom={4}>
+      <InputGroup size="md" marginBottom={1}>
         <InputLeftElement
           pointerEvents="none"
           // eslint-disable-next-line react/no-children-prop
@@ -230,7 +230,6 @@ const PaginatedProjectFeedbacks = (props: Props) => {
           onChange={handleInputChange}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
-          marginBottom={2}
         />
       </InputGroup>
       <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
