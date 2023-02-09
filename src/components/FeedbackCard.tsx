@@ -2,7 +2,6 @@ import { Avatar, Box, Flex, Spacer, Text } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { ProjectFeedback } from "types/projectFeedback";
-import { useEffect, useState } from "react";
 
 export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
   const { projectFeedback } = props;
