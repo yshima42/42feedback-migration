@@ -9,8 +9,6 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
 
   // propsとしてDate型を渡すと、errorになるので、stringとして取ってきている
   const date = new Date(projectFeedback.updated_at);
-  const dateString =
-    date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
 
   return (
     <>
@@ -33,7 +31,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
         <Box alignSelf="end">
           <Flex>
             <Text px="2" fontSize="sm">
-              {dateString}
+              {date.toDateString()}
             </Text>
             <Link
               href={`https://projects.intra.42.fr/projects/${projectFeedback.slug}/projects_users/${projectFeedback.projects_user_id}`}
