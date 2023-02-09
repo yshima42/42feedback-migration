@@ -14,7 +14,7 @@ export const Layout: React.FC<Props> = (props) => {
     <div>
       <Header />
       <Container maxW="container.xl">
-        <Box p={4}>
+        <Box p={{ base: 1, md: 4 }}>
           {pageTitle && (
             <Heading py="2" as="h2" fontSize="2xl">
               {pageTitle}
