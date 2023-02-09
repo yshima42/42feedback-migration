@@ -1,10 +1,12 @@
 import { Layout } from "@/components/Layout";
+
 import {
   Center,
   Box,
   Input,
   InputGroup,
   InputLeftElement,
+  Text
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
@@ -228,8 +230,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
           onChange={handleInputChange}
           onCompositionStart={handleCompositionStart}
           onCompositionEnd={handleCompositionEnd}
+          marginBottom={2}
         />
       </InputGroup>
+      <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (
