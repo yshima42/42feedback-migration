@@ -3,9 +3,11 @@ import { ExternalLinkIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { Feedback } from "types/Feedback";
 
-export const FeedbackCard = (props: { feedback: Feedback }) => {
-  const { feedback } = props;
+type Props = {
+  feedback: Feedback;
+};
 
+export const FeedbackCard = ({ feedback }: Props) => {
   // propsとしてDate型を渡すと、errorになるので、stringとして取ってきている
   const date = new Date(feedback.updated_at);
 

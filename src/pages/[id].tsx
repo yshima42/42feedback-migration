@@ -1,29 +1,19 @@
 import { Layout } from "@/components/Layout";
-import {
-  Center,
-  Box,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  Text,
-  Select,
-  Flex,
-} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { SITE_NAME, FEEDBACKS_PER_PAGE } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchScaleTeams } from "utils/functions";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import ReactPaginate from "react-paginate";
+import { useEffect, useState } from "react";
 import { CursusUser } from "types/cursusUsers";
-import { Feedback, SortType } from "types/Feedback";
-import { FeedbackCard } from "@/components/FeedbackCard";
+import { CompareFunc, Feedback, SortType } from "types/Feedback";
 import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
 import { ScaleTeam } from "types/scaleTeam";
 import escapeStringRegexp from "escape-string-regexp";
-import { SearchIcon } from "@chakra-ui/icons";
+import { FeedbackList } from "@/features/feedbacks/components/FeedbackList";
+import { FeedbackPagination } from "@/features/feedbacks/components/FeedbackPagination";
+import { FeedbackFilters } from "@/features/feedbacks/components/FeedbackFilters";
 
 const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
   if (
@@ -111,22 +101,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 };
 
-const Feedbacks = (props: { feedbacks: Feedback[] }) => {
-  const { feedbacks } = props;
-
-  return (
-    <>
-      {feedbacks.map((projectFeedback: Feedback) => (
-        <Box key={projectFeedback.id} mb={8}>
-          <FeedbackCard feedback={projectFeedback} />
-        </Box>
-      ))}
-    </>
-  );
-};
-
-type CompareFunc = (a: Feedback, b: Feedback) => number;
-
 const sortTypeToCompareFunc = new Map<SortType, CompareFunc>([
   [SortType.UpdateAtAsc, (a, b) => a.updated_at.localeCompare(b.updated_at)],
   [SortType.UpdateAtDesc, (a, b) => b.updated_at.localeCompare(a.updated_at)],
@@ -140,137 +114,7 @@ type Props = {
   projectName: string;
 };
 
-const FeedbackSearchBox = ({
-  setSearchWord,
-}: {
-  setSearchWord: Dispatch<SetStateAction<string>>;
-}) => {
-  const [isComposing, setIsComposing] = useState(false);
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (isComposing) {
-      return;
-    }
-    setSearchWord(event.target.value);
-  };
-
-  const handleCompositionStart = () => {
-    setIsComposing(true);
-  };
-
-  const handleCompositionEnd = (
-    event: React.CompositionEvent<HTMLInputElement>
-  ) => {
-    setIsComposing(false);
-    setSearchWord((previous: string) => previous + event.data);
-  };
-
-  return (
-    <InputGroup size="md" marginBottom={2}>
-      <InputLeftElement pointerEvents="none">
-        <SearchIcon color="gray.300" />
-      </InputLeftElement>
-      <Input
-        placeholder="login or comment"
-        onChange={handleInputChange}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
-      />
-    </InputGroup>
-  );
-};
-
-const FeedbackSortSelect = ({
-  setSortType,
-}: {
-  setSortType: Dispatch<SetStateAction<SortType>>;
-}) => {
-  return (
-    <Select
-      width={200}
-      marginLeft={0.5}
-      textAlign={"center"}
-      backgroundColor={"gray.100"}
-      placeholder={"⇅ Sort"}
-      onChange={(event) => setSortType(event.target.value as SortType)}
-    >
-      <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
-      <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
-      <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
-      <option value={SortType.CommentLengthASC}>Length(Asc)</option>
-    </Select>
-  );
-};
-
-const FeedbackFilters = ({
-  setSearchWord,
-  setSortType,
-  feedbackCount,
-}: {
-  setSearchWord: Dispatch<SetStateAction<string>>;
-  setSortType: Dispatch<SetStateAction<SortType>>;
-  feedbackCount: number;
-}) => {
-  return (
-    <>
-      <Flex>
-        <FeedbackSearchBox setSearchWord={setSearchWord} />
-        <FeedbackSortSelect setSortType={setSortType} />
-      </Flex>
-      <Text opacity={0.6}>{feedbackCount} feedbacks</Text>
-    </>
-  );
-};
-
-const FeedbackPagination = ({
-  feedbackCount,
-  targetFeedbackCount,
-  itemOffset,
-  setItemOffset,
-}: {
-  feedbackCount: number;
-  targetFeedbackCount: number;
-  itemOffset: number;
-  setItemOffset: Dispatch<SetStateAction<number>>;
-}) => {
-  const pageCount = Math.ceil(targetFeedbackCount / FEEDBACKS_PER_PAGE);
-  const handlePageChange = (event: { selected: number }) => {
-    const newOffset = (event.selected * FEEDBACKS_PER_PAGE) % feedbackCount;
-    setItemOffset(newOffset);
-  };
-  const isPaginationDisabled = pageCount <= 1;
-
-  return (
-    <Center>
-      {isPaginationDisabled ? (
-        <></>
-      ) : (
-        <ReactPaginate
-          breakLabel="..."
-          nextLabel=">"
-          onPageChange={handlePageChange}
-          forcePage={itemOffset / FEEDBACKS_PER_PAGE}
-          pageRangeDisplayed={5}
-          pageCount={pageCount}
-          previousLabel="<"
-          pageClassName="page-item"
-          pageLinkClassName="page-link"
-          previousClassName="page-item"
-          previousLinkClassName="page-link"
-          nextClassName="page-item"
-          nextLinkClassName="page-link"
-          breakClassName="page-item"
-          breakLinkClassName="page-link"
-          containerClassName="pagination"
-          activeClassName="active"
-        />
-      )}
-    </Center>
-  );
-};
-
-const PaginatedFeedbacks = (props: Props) => {
-  const { feedbacks, projectName } = props;
-
+const Feedbacks = ({ feedbacks, projectName }: Props) => {
   const [searchWord, setSearchWord] = useState("");
   const [targetFeedbacks, setTargetFeedbacks] = useState(feedbacks);
   const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
@@ -324,7 +168,7 @@ const PaginatedFeedbacks = (props: Props) => {
           setSortType={setSortType}
           feedbackCount={targetFeedbacks.length}
         />
-        <Feedbacks feedbacks={currentItems} />
+        <FeedbackList feedbacks={currentItems} />
         <FeedbackPagination
           feedbackCount={feedbacks.length}
           targetFeedbackCount={targetFeedbacks.length}
@@ -336,4 +180,4 @@ const PaginatedFeedbacks = (props: Props) => {
   );
 };
 
-export default PaginatedFeedbacks;
+export default Feedbacks;
