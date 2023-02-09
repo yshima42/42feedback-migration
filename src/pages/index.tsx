@@ -1,17 +1,13 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
-import { Box } from "@chakra-ui/react";
+import { Text, Box, Center, Wrap, WrapItem } from "@chakra-ui/react";
 import { cursusProjects } from "../../utils/objects";
+import { ProjectGrid } from "@/components/ProjectGrid";
 
 const Home = () => {
   return (
     <Layout name="">
-      {cursusProjects.map((cursusProject) => (
-        <Box key={cursusProject.slug}>
-          <Link href={`/${cursusProject.slug}`}>{cursusProject.name}</Link>
-          <br />
-        </Box>
-      ))}
+      <ProjectGrid cursusProjects={cursusProjects} />
     </Layout>
   );
 };
