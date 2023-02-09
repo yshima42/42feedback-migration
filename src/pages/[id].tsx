@@ -6,14 +6,16 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
-  Text
+  Text,
+  Select,
+  Flex,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
 import { ProjectFeedback } from "types/projectFeedback";
@@ -127,6 +129,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
   }
 };
 
+enum SortType {
+  UpdateAtAsc = "UpdateAtAsc",
+  UpdateAtDesc = "UpdateAtDesc",
+  CommentLengthASC = "CommentLengthASC",
+  CommentLengthDesc = "CommentLengthDesc",
+  None = "None",
+}
+
 type Props = {
   projectFeedbacks: ProjectFeedback[];
 };
@@ -152,10 +162,14 @@ const PaginatedProjectFeedbacks = (props: Props) => {
 
   const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
     useState(projectFeedbacks);
+  const [sortedProjectFeedbacks, setSortedProjectFeedbacks] =
+    useState(projectFeedbacks);
+  const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
   const [itemOffset, setItemOffset] = useState(0);
   const [isComposing, setIsComposing] = useState(false);
+
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
-  const currentItems = searchedProjectFeedbacks.slice(itemOffset, endOffset);
+  const currentItems = sortedProjectFeedbacks.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(
     searchedProjectFeedbacks.length / FEEDBACKS_PER_PAGE
   );
@@ -164,6 +178,39 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   useEffect(() => {
     window.scroll(0, 0);
   }, [currentItems]);
+
+  const sortFeedback = useCallback(
+    (feedbacks: ProjectFeedback[], sortType: SortType) => {
+      const callback = (a: ProjectFeedback, b: ProjectFeedback) => {
+        switch (sortType) {
+          case SortType.UpdateAtAsc:
+            return (
+              new Date(a.updated_at).getTime() -
+              new Date(b.updated_at).getTime()
+            );
+          case SortType.UpdateAtDesc:
+            return (
+              new Date(b.updated_at).getTime() -
+              new Date(a.updated_at).getTime()
+            );
+          case SortType.CommentLengthASC:
+            return a.comment.length - b.comment.length;
+          case SortType.CommentLengthDesc:
+            return b.comment.length - a.comment.length;
+          case SortType.None:
+            return 0;
+        }
+      };
+      const newSortedProjectFeedbacks = [...feedbacks].sort(callback);
+      setSortedProjectFeedbacks(newSortedProjectFeedbacks);
+    },
+    []
+  );
+
+  // ソートを管理
+  useEffect(() => {
+    sortFeedback(searchedProjectFeedbacks, sortType);
+  }, [searchedProjectFeedbacks, sortFeedback, sortType]);
 
   const handlePageChange = (event: { selected: number }) => {
     const newOffset =
@@ -219,20 +266,35 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <InputGroup size="md" marginBottom={4}>
-        <InputLeftElement
-          pointerEvents="none"
-          // eslint-disable-next-line react/no-children-prop
-          children={<SearchIcon color="gray.300" />}
-        />
-        <Input
-          placeholder="intra名、またはフィードバックの内容"
-          onChange={handleInputChange}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
-          marginBottom={2}
-        />
-      </InputGroup>
+      <Flex>
+        <InputGroup size="md" marginBottom={4}>
+          <InputLeftElement
+            pointerEvents="none"
+            // eslint-disable-next-line react/no-children-prop
+            children={<SearchIcon color="gray.300" />}
+          />
+          <Input
+            placeholder="login or comment"
+            onChange={handleInputChange}
+            onCompositionStart={handleCompositionStart}
+            onCompositionEnd={handleCompositionEnd}
+            marginBottom={2}
+          />
+        </InputGroup>
+        <Select
+          width={200}
+          marginLeft={0.5}
+          textAlign={"center"}
+          backgroundColor={"gray.100"}
+          placeholder={"⇅ Sort"}
+          onChange={(event) => setSortType(event.target.value as SortType)}
+        >
+          <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
+          <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
+          <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
+          <option value={SortType.CommentLengthASC}>Length(Asc)</option>
+        </Select>
+      </Flex>
       <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
