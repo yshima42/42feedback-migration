@@ -26,20 +26,11 @@ export const ProjectGrids: React.FC<Props> = (props) => {
           .map((cursusProject) => (
             <WrapItem key={cursusProject.name}>
               <Link href={`/${cursusProject.name}`}>
-                {/* <Box
-                  w="160px"
-                  h="50px"
-                  bg="gray.200"
-                  borderRadius="10px"
-                  shadow="md"
-                  _hover={{ cursor: "pointer", opacity: "0.8" }}
-                > */}
                 <Button w="150px" h="150px">
                   <Center py="3">
                     <Text fontSize="lg">{cursusProject.name}</Text>
                   </Center>
                 </Button>
-                {/* </Box> */}
               </Link>
             </WrapItem>
           ))}
