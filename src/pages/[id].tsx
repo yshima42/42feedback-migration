@@ -1,9 +1,15 @@
 import { Layout } from "@/components/Layout";
-import { Center, Box, Input } from "@chakra-ui/react";
+import {
+  Center,
+  Box,
+  Input,
+  InputGroup,
+  InputLeftElement,
+} from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
 import Head from "next/head";
-import { cursusProjects } from "../../../utils/objects";
+import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
@@ -14,6 +20,7 @@ import cursusUsers from "utils/preval/cursus-users.preval";
 import token from "utils/preval/access-token.preval";
 import { ScaleTeam } from "types/scaleTeam";
 import escapeStringRegexp from "escape-string-regexp";
+import { SearchIcon } from "@chakra-ui/icons";
 
 const fetchScaleTeams = async (projectId: string, accessToken: string) => {
   const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
@@ -144,6 +151,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
     useState(projectFeedbacks);
   const [itemOffset, setItemOffset] = useState(0);
+  const [isComposing, setIsComposing] = useState(false);
   const endOffset = itemOffset + FEEDBACKS_PER_PAGE;
   const currentItems = searchedProjectFeedbacks.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(
@@ -166,20 +174,47 @@ const PaginatedProjectFeedbacks = (props: Props) => {
     setItemOffset(newOffset);
   };
 
+  const includesSearchKeyword = (
+    projectFeedback: ProjectFeedback,
+    searchKeyword: string
+  ) => {
+    // 入力された文字列を安全に正規表現に変換
+    const escapedSearchKeyword = escapeStringRegexp(searchKeyword);
+    const regex = new RegExp(escapedSearchKeyword, "i");
+    return (
+      projectFeedback.comment.match(regex) ||
+      projectFeedback.corrector.login.match(regex)
+    );
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (isComposing) {
+      return;
+    }
     const newSearchedProjectFeedbacks = projectFeedbacks.filter(
       (projectFeedback) => {
-        // 入力された文字列を安全に正規表現に変換
-        const escapedText = escapeStringRegexp(event.target.value);
-        const regex = new RegExp(escapedText, "i");
-        return (
-          projectFeedback.comment.match(regex) ||
-          projectFeedback.corrector.login.match(regex)
-        );
+        return includesSearchKeyword(projectFeedback, event.target.value);
       }
     );
     setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
     setItemOffset(0);
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = (
+    event: React.CompositionEvent<HTMLInputElement>
+  ) => {
+    const newSearchedProjectFeedbacks = projectFeedbacks.filter(
+      (projectFeedback) => {
+        return includesSearchKeyword(projectFeedback, event.data);
+      }
+    );
+    setSearchedProjectFeedbacks(newSearchedProjectFeedbacks);
+    setItemOffset(0);
+    setIsComposing(false);
   };
 
   return (
@@ -187,11 +222,19 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Input
-        placeholder="intra名、またはフィードバックの内容"
-        onChange={handleInputChange}
-        marginBottom={4}
-      />
+      <InputGroup size="md" marginBottom={4}>
+        <InputLeftElement
+          pointerEvents="none"
+          // eslint-disable-next-line react/no-children-prop
+          children={<SearchIcon color="gray.300" />}
+        />
+        <Input
+          placeholder="intra名、またはフィードバックの内容"
+          onChange={handleInputChange}
+          onCompositionStart={handleCompositionStart}
+          onCompositionEnd={handleCompositionEnd}
+        />
+      </InputGroup>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (
@@ -201,6 +244,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
             breakLabel="..."
             nextLabel=">"
             onPageChange={handlePageChange}
+            forcePage={itemOffset / FEEDBACKS_PER_PAGE}
             pageRangeDisplayed={5}
             pageCount={pageCount}
             previousLabel="<"

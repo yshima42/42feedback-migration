@@ -2,17 +2,17 @@
 import React from "react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
-import { Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, Heading, Text } from "@chakra-ui/react";
 
 const Header: React.FC = () => {
   const { data: session, status } = useSession();
 
-  let left = <Link href="/">42Progress</Link>;
+  let left = <Link href="/">42 Feedback</Link>;
 
   let right = null;
 
   if (status === "loading") {
-    left = <Link href="/">42Feedback</Link>;
+    left = <Link href="/">42 Feedback</Link>;
     right = <Text>Validating session ...</Text>;
   }
 
@@ -25,16 +25,14 @@ const Header: React.FC = () => {
       <Heading as="h1" fontSize={{ base: "md", md: "xl" }}>
         <Link href="/">
           {/* next/linkだとデフォルトでホバーした時に青くなってしまうので無効化 */}
-          <Text _hover={{ color: "gray.50" }}>42Progress</Text>
+          <Text _hover={{ color: "gray.50" }}>42 Feedback</Text>
         </Link>
       </Heading>
     );
     right = (
       <Flex align="center">
         <Box pr={4} fontSize="xs" display={{ base: "none", md: "flex" }}>
-          <Text>
-            {session.user?.name} ({session.user?.email})
-          </Text>
+          <Avatar src={session.user?.image ?? ""} size="sm" />
         </Box>
         <Button
           colorScheme="gray"
