@@ -151,13 +151,8 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   );
 
   // ページ遷移時にページトップにスクロール
-  // こちら参考: https://stackoverflow.com/questions/36904185/react-router-scroll-to-top-on-every-transition
-  // もっと良いものあるかも: https://developer.mozilla.org/ja/docs/Web/API/Window/scrollTo
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    window.scroll(0, 0);
   }, [currentItems]);
 
   const handlePageChange = (event: { selected: number }) => {
