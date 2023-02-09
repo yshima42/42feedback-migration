@@ -121,7 +121,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     );
 
     return {
-      props: { projectFeedbacks },
+      props: { projectFeedbacks, projectName: name },
       revalidate: 60 * 60,
     };
   } catch (error) {
@@ -140,9 +140,10 @@ enum SortType {
 
 type Props = {
   projectFeedbacks: ProjectFeedback[];
+  projectName: string;
 };
 
-const ProjectFeedbacks = (props: Props) => {
+const ProjectFeedbacks = (props: { projectFeedbacks: ProjectFeedback[] }) => {
   const { projectFeedbacks } = props;
 
   return (
@@ -159,7 +160,7 @@ const ProjectFeedbacks = (props: Props) => {
 const FEEDBACKS_PER_PAGE = 20;
 
 const PaginatedProjectFeedbacks = (props: Props) => {
-  const { projectFeedbacks } = props;
+  const { projectFeedbacks, projectName } = props;
 
   const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
     useState(projectFeedbacks);
@@ -267,10 +268,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
       <Head>
         <meta name="robots" content="noindex,nofollow" />
         <title>
-          {projectFeedbacks[0].slug} - {SITE_NAME}
+          {projectName} - {SITE_NAME}
         </title>
       </Head>
-      <Layout pageTitle={projectFeedbacks[0].slug}>
+      <Layout pageTitle={projectName}>
         <Flex>
           <InputGroup size="md" marginBottom={2}>
             <InputLeftElement pointerEvents="none">
