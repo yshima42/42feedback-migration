@@ -26,8 +26,8 @@ export const ProjectGrids: React.FC<Props> = (props) => {
             <WrapItem key={cursusProject.slug}>
               <Link href={`/${cursusProject.slug}`}>
                 <Box
-                  w="160px"
-                  h="160px"
+                  w="140px"
+                  h="140px"
                   bg="gray.200"
                   borderRadius="10px"
                   shadow="md"
