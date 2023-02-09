@@ -13,12 +13,6 @@ const Home = () => {
           designatedRank={value + 1}
         />
       ))}
-      {/* <ProjectGrids cursusProjects={cursusProjects} designatedRank={1} />
-      <ProjectGrids cursusProjects={cursusProjects} designatedRank={2} />
-      <ProjectGrids cursusProjects={cursusProjects} designatedRank={3} />
-      <ProjectGrids cursusProjects={cursusProjects} designatedRank={4} />
-      <ProjectGrids cursusProjects={cursusProjects} designatedRank={5} />
-      <ProjectGrids cursusProjects={cursusProjects} designatedRank={6} /> */}
     </Layout>
   );
 };
