@@ -1,0 +1,4 @@
+html {
+  /* bootstrapでのscroll-behavior設定を上書きするための記述 */
+  scroll-behavior: auto !important;
+}
