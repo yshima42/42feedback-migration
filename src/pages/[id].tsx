@@ -4,12 +4,10 @@ import {
   Center,
   Box,
   Input,
-  Radio,
-  RadioGroup,
-  Stack,
   InputGroup,
   InputLeftElement,
   Text,
+  Select,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
 import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
@@ -165,7 +163,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
     useState(projectFeedbacks);
   const [sortedProjectFeedbacks, setSortedProjectFeedbacks] =
     useState(projectFeedbacks);
-  const [sortType, setSortType] = useState(SortType.None);
+  const [sortType, setSortType] = useState(SortType.UpdateAtDesc);
   const [itemOffset, setItemOffset] = useState(0);
   const [isComposing, setIsComposing] = useState(false);
 
@@ -183,7 +181,6 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   const sortFeedback = useCallback(
     (feedbacks: ProjectFeedback[], sortType: SortType) => {
       const callback = (a: ProjectFeedback, b: ProjectFeedback) => {
-        console.log(a.updated_at);
         switch (sortType) {
           case SortType.UpdateAtAsc:
             return (
@@ -283,17 +280,16 @@ const PaginatedProjectFeedbacks = (props: Props) => {
         />
       </InputGroup>
       <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
-      <RadioGroup
-        onChange={(value) => setSortType(value as SortType)}
-        value={sortType}
+      <Select
+        width={160}
+        placeholder={"Sort"}
+        onChange={(event) => setSortType(event.target.value as SortType)}
       >
-        <Stack direction="row" spacing={4} marginBottom={4}>
-          <Radio value={SortType.UpdateAtDesc}>Date(Desc)</Radio>
-          <Radio value={SortType.UpdateAtAsc}>Date(Asc)</Radio>
-          <Radio value={SortType.CommentLengthDesc}>Length(Desc)</Radio>
-          <Radio value={SortType.CommentLengthASC}>Length(Asc)</Radio>
-        </Stack>
-      </RadioGroup>
+        <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
+        <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
+        <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
+        <option value={SortType.CommentLengthASC}>Length(Asc)</option>
+      </Select>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (
