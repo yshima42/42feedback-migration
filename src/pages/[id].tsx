@@ -216,7 +216,7 @@ const PaginatedProjectFeedbacks = (props: Props) => {
         onCompositionEnd={handleCompositionEnd}
         marginBottom={2}
       />
-      <Text opacity={0.6}>About {searchedProjectFeedbacks.length} results</Text>
+      <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
       <Center>
         {pageCount === 0 || pageCount == 1 ? (
