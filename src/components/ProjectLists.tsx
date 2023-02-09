@@ -9,29 +9,32 @@ type Props = {
     rank: number;
   }[];
   designatedRank: number;
+  marginBottom: string;
 };
 
 export const ProjectLists: React.FC<Props> = (props) => {
-  const { cursusProjects, designatedRank } = props;
+  const { cursusProjects, designatedRank, marginBottom } = props;
 
   return (
-    <Box>
+    <Box marginBottom={marginBottom}>
       <Text fontSize="lg" fontWeight="bold">
         Rank {designatedRank}
       </Text>
-      <UnorderedList>
-        {cursusProjects
-          .filter((value) => value.rank === designatedRank)
-          .map((cursusProject) => (
-            <ListItem key={cursusProject.name}>
-              <Link href={`/${cursusProject.name}`}>
-                <Text color="blue.500" fontSize="lg">
-                  <a>{cursusProject.name}</a>
-                </Text>
-              </Link>
-            </ListItem>
-          ))}
-      </UnorderedList>
+      <Box marginLeft={"1em"}>
+        <UnorderedList spacing={0.5}>
+          {cursusProjects
+            .filter((value) => value.rank === designatedRank)
+            .map((cursusProject) => (
+              <ListItem key={cursusProject.name}>
+                <Link href={`/${cursusProject.name}`}>
+                  <Text color="blue.500" fontSize="lg">
+                    <a>{cursusProject.name}</a>
+                  </Text>
+                </Link>
+              </ListItem>
+            ))}
+        </UnorderedList>
+      </Box>
     </Box>
   );
 };

@@ -27,6 +27,7 @@ const Home = () => {
                   key={value}
                   cursusProjects={cursusProjects}
                   designatedRank={value}
+                  marginBottom="3"
                 />
               ))}
         </Box>
