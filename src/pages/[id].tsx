@@ -263,64 +263,66 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   return (
-    <Layout pageTitle={projectFeedbacks[0].slug}>
+    <>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
-      <Flex>
-        <InputGroup size="md" marginBottom={2}>
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.300" />
-          </InputLeftElement>
-          <Input
-            placeholder="login or comment"
-            onChange={handleInputChange}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-          />
-        </InputGroup>
-        <Select
-          width={200}
-          marginLeft={0.5}
-          textAlign={"center"}
-          backgroundColor={"gray.100"}
-          placeholder={"⇅ Sort"}
-          onChange={(event) => setSortType(event.target.value as SortType)}
-        >
-          <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
-          <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
-          <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
-          <option value={SortType.CommentLengthASC}>Length(Asc)</option>
-        </Select>
-      </Flex>
-      <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
-      <ProjectFeedbacks projectFeedbacks={currentItems} />
-      <Center>
-        {pageCount === 0 || pageCount == 1 ? (
-          <></>
-        ) : (
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel=">"
-            onPageChange={handlePageChange}
-            forcePage={itemOffset / FEEDBACKS_PER_PAGE}
-            pageRangeDisplayed={5}
-            pageCount={pageCount}
-            previousLabel="<"
-            pageClassName="page-item"
-            pageLinkClassName="page-link"
-            previousClassName="page-item"
-            previousLinkClassName="page-link"
-            nextClassName="page-item"
-            nextLinkClassName="page-link"
-            breakClassName="page-item"
-            breakLinkClassName="page-link"
-            containerClassName="pagination"
-            activeClassName="active"
-          />
-        )}
-      </Center>
-    </Layout>
+      <Layout pageTitle={projectFeedbacks[0].slug}>
+        <Flex>
+          <InputGroup size="md" marginBottom={2}>
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.300" />
+            </InputLeftElement>
+            <Input
+              placeholder="login or comment"
+              onChange={handleInputChange}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
+            />
+          </InputGroup>
+          <Select
+            width={200}
+            marginLeft={0.5}
+            textAlign={"center"}
+            backgroundColor={"gray.100"}
+            placeholder={"⇅ Sort"}
+            onChange={(event) => setSortType(event.target.value as SortType)}
+          >
+            <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
+            <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
+            <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
+            <option value={SortType.CommentLengthASC}>Length(Asc)</option>
+          </Select>
+        </Flex>
+        <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
+        <ProjectFeedbacks projectFeedbacks={currentItems} />
+        <Center>
+          {pageCount === 0 || pageCount == 1 ? (
+            <></>
+          ) : (
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel=">"
+              onPageChange={handlePageChange}
+              forcePage={itemOffset / FEEDBACKS_PER_PAGE}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+              previousLabel="<"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              containerClassName="pagination"
+              activeClassName="active"
+            />
+          )}
+        </Center>
+      </Layout>
+    </>
   );
 };
 
