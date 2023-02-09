@@ -131,6 +131,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 enum SortType {
+  UpdateAtAsc = "UpdateAtAsc",
+  UpdateAtDesc = "UpdateAtDesc",
   CommentLengthASC = "CommentLengthASC",
   CommentLengthDesc = "CommentLengthDesc",
   None = "None",
@@ -181,7 +183,18 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   const sortFeedback = useCallback(
     (feedbacks: ProjectFeedback[], sortType: SortType) => {
       const callback = (a: ProjectFeedback, b: ProjectFeedback) => {
+        console.log(a.updated_at);
         switch (sortType) {
+          case SortType.UpdateAtAsc:
+            return (
+              new Date(a.updated_at).getTime() -
+              new Date(b.updated_at).getTime()
+            );
+          case SortType.UpdateAtDesc:
+            return (
+              new Date(b.updated_at).getTime() -
+              new Date(a.updated_at).getTime()
+            );
           case SortType.CommentLengthASC:
             return a.comment.length - b.comment.length;
           case SortType.CommentLengthDesc:
@@ -275,9 +288,10 @@ const PaginatedProjectFeedbacks = (props: Props) => {
         value={sortType}
       >
         <Stack direction="row" spacing={4} marginBottom={4}>
-          <Radio value={SortType.None}>Default</Radio>
-          <Radio value={SortType.CommentLengthASC}>Length(Asc)</Radio>
+          <Radio value={SortType.UpdateAtDesc}>Date(Desc)</Radio>
+          <Radio value={SortType.UpdateAtAsc}>Date(Asc)</Radio>
           <Radio value={SortType.CommentLengthDesc}>Length(Desc)</Radio>
+          <Radio value={SortType.CommentLengthASC}>Length(Asc)</Radio>
         </Stack>
       </RadioGroup>
       <ProjectFeedbacks projectFeedbacks={currentItems} />
