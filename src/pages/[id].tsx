@@ -85,7 +85,7 @@ export const getStaticPaths = async () => {
   const paths = cursusProjects.map((project) => {
     return {
       params: {
-        id: project.slug,
+        id: project.name,
       },
     };
   });
@@ -102,8 +102,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return { notFound: true };
   }
 
-  const slug = context.params.id as string;
-  if (!cursusProjects.find((project) => project.slug === slug)) {
+  const name = context.params.id as string;
+  const slug = cursusProjects.find((project) => project.name === name)?.slug;
+  if (!slug) {
     return { notFound: true };
   }
 
@@ -262,23 +263,20 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   return (
-    <Layout name={projectFeedbacks[0].slug}>
+    <Layout pageTitle={projectFeedbacks[0].slug}>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
       </Head>
       <Flex>
-        <InputGroup size="md" marginBottom={4}>
-          <InputLeftElement
-            pointerEvents="none"
-            // eslint-disable-next-line react/no-children-prop
-            children={<SearchIcon color="gray.300" />}
-          />
+        <InputGroup size="md" marginBottom={2}>
+          <InputLeftElement pointerEvents="none">
+            <SearchIcon color="gray.300" />
+          </InputLeftElement>
           <Input
             placeholder="login or comment"
             onChange={handleInputChange}
             onCompositionStart={handleCompositionStart}
             onCompositionEnd={handleCompositionEnd}
-            marginBottom={2}
           />
         </InputGroup>
         <Select

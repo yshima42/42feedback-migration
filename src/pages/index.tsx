@@ -1,17 +1,42 @@
 import Link from "next/link";
 import { Layout } from "@/components/Layout";
-import { Box } from "@chakra-ui/react";
 import { cursusProjects } from "../../utils/objects";
+import { ProjectGrids } from "@/components/ProjectGrids";
+import { useState } from "react";
+import { Box, Button, Flex, Spacer } from "@chakra-ui/react";
+import { ProjectLists } from "@/components/ProjectLists";
 
 const Home = () => {
+  const [isGrid, setIsGrid] = useState(false);
+
   return (
-    <Layout name="">
-      {cursusProjects.map((cursusProject) => (
-        <Box key={cursusProject.slug}>
-          <Link href={`/${cursusProject.slug}`}>{cursusProject.name}</Link>
-          <br />
+    <Layout>
+      <Flex>
+        <Box>
+          {isGrid
+            ? [...Array(7).keys()].map((value) => (
+                <ProjectGrids
+                  key={value}
+                  cursusProjects={cursusProjects}
+                  designatedRank={value}
+                  marginBottom="3"
+                />
+              ))
+            : [...Array(7).keys()].map((value) => (
+                <ProjectLists
+                  key={value}
+                  cursusProjects={cursusProjects}
+                  designatedRank={value}
+                />
+              ))}
         </Box>
-      ))}
+        <Spacer />
+        <Box>
+          <Button size="sm" onClick={() => setIsGrid(!isGrid)}>
+            {isGrid ? "List" : "Grid"}
+          </Button>
+        </Box>
+      </Flex>
     </Layout>
   );
 };

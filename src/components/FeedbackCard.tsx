@@ -14,7 +14,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
       <Flex>
         <Avatar src={projectFeedback.corrector.image} />
         <Box alignSelf="end">
-          <Flex px="2">
+          <Flex px="2" alignItems="end">
             <Text fontSize="md">Evaluated by </Text>
             <Link
               href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
@@ -24,9 +24,7 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
                 {projectFeedback.corrector.login}
               </Text>
             </Link>
-            <Box alignSelf="end" px="1">
-              <Text fontSize="sm">{date.toDateString()}</Text>
-            </Box>
+            <Text fontSize="xs">{date.toDateString()}</Text>
           </Flex>
         </Box>
         <Spacer />
