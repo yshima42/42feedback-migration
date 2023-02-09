@@ -11,7 +11,7 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
-import { API_URL, CAMPUS_ID, CURSUS_ID } from "utils/constants";
+import { API_URL, CAMPUS_ID, CURSUS_ID, SITE_NAME } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
 import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
@@ -121,7 +121,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     );
 
     return {
-      props: { projectFeedbacks },
+      props: { projectFeedbacks, projectName: name },
       revalidate: 60 * 60,
     };
   } catch (error) {
@@ -140,9 +140,10 @@ enum SortType {
 
 type Props = {
   projectFeedbacks: ProjectFeedback[];
+  projectName: string;
 };
 
-const ProjectFeedbacks = (props: Props) => {
+const ProjectFeedbacks = (props: { projectFeedbacks: ProjectFeedback[] }) => {
   const { projectFeedbacks } = props;
 
   return (
@@ -159,7 +160,7 @@ const ProjectFeedbacks = (props: Props) => {
 const FEEDBACKS_PER_PAGE = 20;
 
 const PaginatedProjectFeedbacks = (props: Props) => {
-  const { projectFeedbacks } = props;
+  const { projectFeedbacks, projectName } = props;
 
   const [searchedProjectFeedbacks, setSearchedProjectFeedbacks] =
     useState(projectFeedbacks);
@@ -263,64 +264,69 @@ const PaginatedProjectFeedbacks = (props: Props) => {
   };
 
   return (
-    <Layout pageTitle={projectFeedbacks[0].slug}>
+    <>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
+        <title>
+          {projectName} - {SITE_NAME}
+        </title>
       </Head>
-      <Flex>
-        <InputGroup size="md" marginBottom={2}>
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.300" />
-          </InputLeftElement>
-          <Input
-            placeholder="login or comment"
-            onChange={handleInputChange}
-            onCompositionStart={handleCompositionStart}
-            onCompositionEnd={handleCompositionEnd}
-          />
-        </InputGroup>
-        <Select
-          width={200}
-          marginLeft={0.5}
-          textAlign={"center"}
-          backgroundColor={"gray.100"}
-          placeholder={"⇅ Sort"}
-          onChange={(event) => setSortType(event.target.value as SortType)}
-        >
-          <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
-          <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
-          <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
-          <option value={SortType.CommentLengthASC}>Length(Asc)</option>
-        </Select>
-      </Flex>
-      <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
-      <ProjectFeedbacks projectFeedbacks={currentItems} />
-      <Center>
-        {pageCount === 0 || pageCount == 1 ? (
-          <></>
-        ) : (
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel=">"
-            onPageChange={handlePageChange}
-            forcePage={itemOffset / FEEDBACKS_PER_PAGE}
-            pageRangeDisplayed={5}
-            pageCount={pageCount}
-            previousLabel="<"
-            pageClassName="page-item"
-            pageLinkClassName="page-link"
-            previousClassName="page-item"
-            previousLinkClassName="page-link"
-            nextClassName="page-item"
-            nextLinkClassName="page-link"
-            breakClassName="page-item"
-            breakLinkClassName="page-link"
-            containerClassName="pagination"
-            activeClassName="active"
-          />
-        )}
-      </Center>
-    </Layout>
+      <Layout pageTitle={projectName}>
+        <Flex>
+          <InputGroup size="md" marginBottom={2}>
+            <InputLeftElement pointerEvents="none">
+              <SearchIcon color="gray.300" />
+            </InputLeftElement>
+            <Input
+              placeholder="login or comment"
+              onChange={handleInputChange}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
+            />
+          </InputGroup>
+          <Select
+            width={200}
+            marginLeft={0.5}
+            textAlign={"center"}
+            backgroundColor={"gray.100"}
+            placeholder={"⇅ Sort"}
+            onChange={(event) => setSortType(event.target.value as SortType)}
+          >
+            <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
+            <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
+            <option value={SortType.CommentLengthDesc}>Length(Desc)</option>
+            <option value={SortType.CommentLengthASC}>Length(Asc)</option>
+          </Select>
+        </Flex>
+        <Text opacity={0.6}>{searchedProjectFeedbacks.length} feedbacks</Text>
+        <ProjectFeedbacks projectFeedbacks={currentItems} />
+        <Center>
+          {pageCount === 0 || pageCount == 1 ? (
+            <></>
+          ) : (
+            <ReactPaginate
+              breakLabel="..."
+              nextLabel=">"
+              onPageChange={handlePageChange}
+              forcePage={itemOffset / FEEDBACKS_PER_PAGE}
+              pageRangeDisplayed={5}
+              pageCount={pageCount}
+              previousLabel="<"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              containerClassName="pagination"
+              activeClassName="active"
+            />
+          )}
+        </Center>
+      </Layout>
+    </>
   );
 };
 
