@@ -15,7 +15,9 @@ export const FeedbackCard = (props: { projectFeedback: ProjectFeedback }) => {
         <Avatar src={projectFeedback.corrector.image} />
         <Box alignSelf="end">
           <Flex px="2" alignItems="end">
-            <Text fontSize="md">Evaluated by </Text>
+            <Text display={{ base: "none", md: "flex" }} fontSize="md">
+              Evaluated by{" "}
+            </Text>
             <Link
               href={`https://profile.intra.42.fr/users/${projectFeedback.corrector.login}`}
               target="_blank"
