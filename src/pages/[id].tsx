@@ -1,5 +1,4 @@
 import { Layout } from "@/components/Layout";
-
 import {
   Center,
   Box,
@@ -11,10 +10,10 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { GetStaticProps } from "next";
-import { API_URL, CAMPUS_ID, CURSUS_ID, SITE_NAME } from "utils/constants";
+import { SITE_NAME } from "utils/constants";
 import Head from "next/head";
 import { cursusProjects } from "../../utils/objects";
-import { axiosRetryInSSG, fetchAllDataByAxios } from "utils/functions";
+import { axiosRetryInSSG, fetchScaleTeams } from "utils/functions";
 import { useCallback, useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { CursusUser } from "types/cursusUsers";
@@ -26,19 +25,9 @@ import { ScaleTeam } from "types/scaleTeam";
 import escapeStringRegexp from "escape-string-regexp";
 import { SearchIcon } from "@chakra-ui/icons";
 
-const fetchScaleTeams = async (projectId: string, accessToken: string) => {
-  const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID}`;
-  const response = await fetchAllDataByAxios(url, accessToken);
-
-  return response;
-};
-
-// ここもしわかりにくかったら教えてください
 const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
   if (
-    // コメントがない場合は除外
     scaleTeam.comment !== null &&
-    // cursus_usersに存在しないユーザーは除外
     cursusUsers.find(
       (cursusUser) => cursusUser.user.login === scaleTeam.corrector.login
     )
@@ -62,7 +51,7 @@ const makeProjectFeedbacks = (
     const targetCursusUser = cursusUsers.find(
       (cursusUser) => cursusUser.user.login === login
     );
-    // 万が一urlが存在しない場合は空文字を入れる
+
     const image = targetCursusUser!.user.image.versions.small ?? "";
 
     return {
@@ -101,19 +90,15 @@ export const getStaticProps: GetStaticProps = async (context) => {
   if (!context.params) {
     return { notFound: true };
   }
-
   const name = context.params.id as string;
   const slug = cursusProjects.find((project) => project.name === name)?.slug;
   if (!slug) {
     return { notFound: true };
   }
-
   // データの取得
   try {
     axiosRetryInSSG();
-
     const scaleTeams = await fetchScaleTeams(slug, token.access_token);
-
     const projectFeedbacks = makeProjectFeedbacks(
       slug,
       scaleTeams,
