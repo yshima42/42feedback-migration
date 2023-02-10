@@ -22,11 +22,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.description}>
-          <Link href={"https://42feedback.vercel.app/"}>
-            Click Here for New Version
-          </Link>
-        </div>
+        <p>URLを変更しました。以後こちらのサイトをご利用ください。</p>
+        <Link href={"https://42feedback.vercel.app/"}>
+          https://42feedback.vercel.app/
+        </Link>
+        <p>こちらのページは、2月24日(金)13:00に削除します。</p>
       </main>
     </>
   );
