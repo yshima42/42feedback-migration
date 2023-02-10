@@ -9,12 +9,13 @@ type Props = {
 export const FeedbackSortSelect = ({ setSortType }: Props) => {
   return (
     <Select
-      width={200}
+      width={180}
       marginLeft={0.5}
       textAlign={"center"}
       backgroundColor={"gray.100"}
       placeholder={"⇅ Sort"}
       onChange={(event) => setSortType(event.target.value as SortType)}
+      fontSize="sm"
     >
       <option value={SortType.UpdateAtDesc}>Date(Desc)</option>
       <option value={SortType.UpdateAtAsc}>Date(Asc)</option>
