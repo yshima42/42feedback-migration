@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import axiosRetry from "axios-retry";
 import { API_URL } from "./constants";
+import { CAMPUS_ID_TOKYO, CURSUS_ID } from "./constants";
 
 const UNINITIALIZED_LAST_PAGE = -1;
 const PAGE_SIZE = 100;
@@ -77,4 +78,14 @@ export const axiosRetryInSSG = async () => {
       console.table(errorMessageObject);
     },
   });
+};
+
+export const fetchScaleTeams = async (
+  projectId: string,
+  accessToken: string
+) => {
+  const url = `${API_URL}/v2/projects/${projectId}/scale_teams?filter[cursus_id]=${CURSUS_ID}&filter[campus_id]=${CAMPUS_ID_TOKYO}`;
+  const response = await fetchAllDataByAxios(url, accessToken);
+
+  return response;
 };
