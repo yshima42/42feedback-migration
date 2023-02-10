@@ -12,7 +12,7 @@ export const Layout: React.FC<Props> = (props) => {
   const { pageTitle, children } = props;
 
   return (
-    <div>
+    <Box minHeight="100vh" paddingBottom={{ base: "3rem", md: "4rem" }}>
       <Header />
       <Container maxW="container.xl">
         <Box p={{ base: 1, md: 4 }}>
@@ -25,6 +25,6 @@ export const Layout: React.FC<Props> = (props) => {
         </Box>
       </Container>
       <Footer />
-    </div>
+    </Box>
   );
 };

@@ -11,6 +11,10 @@ const Footer: React.FC = () => {
       h={{ base: "3rem", md: "4rem" }}
       padding={{ base: "0.5rem", md: "0.7rem" }}
       mt={{ base: "1rem", md: "2rem" }}
+      position="absolute"
+      left={0}
+      right={0}
+      bottom={0}
     ></Flex>
   );
 };

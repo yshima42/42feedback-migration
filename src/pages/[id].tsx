@@ -14,6 +14,8 @@ import escapeStringRegexp from "escape-string-regexp";
 import { FeedbackList } from "@/features/feedbacks/components/FeedbackList";
 import { FeedbackPagination } from "@/features/feedbacks/components/FeedbackPagination";
 import { FeedbackFilters } from "@/features/feedbacks/components/FeedbackFilters";
+import { Box, Flex, Text } from "@chakra-ui/react";
+import Link from "next/link";
 
 const isValidScaleTeam = (scaleTeam: ScaleTeam) => {
   if (
@@ -152,7 +154,7 @@ const Feedbacks = ({ feedbacks, projectName }: Props) => {
   }, [sortType, searchWord, feedbacks]);
 
   return (
-    <>
+    <Box>
       <Head>
         <meta name="robots" content="noindex,nofollow" />
         <title>
@@ -173,7 +175,7 @@ const Feedbacks = ({ feedbacks, projectName }: Props) => {
           setItemOffset={setItemOffset}
         />
       </Layout>
-    </>
+    </Box>
   );
 };
 
