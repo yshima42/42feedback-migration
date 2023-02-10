@@ -1,12 +1,5 @@
 import { DragHandleIcon, HamburgerIcon } from "@chakra-ui/icons";
-import {
-  Box,
-  IconButton,
-  ListItem,
-  Text,
-  UnorderedList,
-} from "@chakra-ui/react";
-import Link from "next/link";
+import { Box, IconButton } from "@chakra-ui/react";
 import React from "react";
 
 type Props = {

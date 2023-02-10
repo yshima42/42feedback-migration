@@ -1,7 +1,6 @@
-// Header.tsx
 import React from "react";
-import { Flex, Text } from "@chakra-ui/react";
-import { SITE_NAME, MAIN_COLOR } from "utils/constants";
+import { Flex } from "@chakra-ui/react";
+import { MAIN_COLOR } from "utils/constants";
 
 const Footer: React.FC = () => {
   return (
