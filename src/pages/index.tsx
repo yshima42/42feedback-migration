@@ -23,9 +23,9 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <div className={styles.description}>
-          Click
-          <Link href={"https://42feedback.vercel.app/"}>Here</Link>
-          for New Version
+          <Link href={"https://42feedback.vercel.app/"}>
+            Click Here for New Version
+          </Link>
         </div>
       </main>
     </>
