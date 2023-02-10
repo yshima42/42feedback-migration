@@ -13,6 +13,17 @@ const theme = extendTheme({
       body: {
         backgroundColor: "gray.40",
         color: "gray.800",
+        a: {
+          color: "teal.400",
+          _hover: {
+            textDecoration: "underline",
+            color: "teal.500",
+            cursor: "pointer",
+            transition: "all 0.2s",
+            fontWeight: "semibold",
+            textDecor: "underline",
+          },
+        },
       },
     },
   },
