@@ -1,5 +1,6 @@
 import { Box, Container, Heading } from "@chakra-ui/react";
 import React, { ReactNode } from "react";
+import Footer from "./Footer";
 import Header from "./Header";
 
 type Props = {
@@ -23,6 +24,7 @@ export const Layout: React.FC<Props> = (props) => {
           {children}
         </Box>
       </Container>
+      <Footer />
     </div>
   );
 };
