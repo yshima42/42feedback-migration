@@ -14,7 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ArrowForwardIcon } from "@chakra-ui/icons";
-import { SITE_NAME } from "utils/constants";
+import { SITE_NAME, MAIN_COLOR } from "utils/constants";
 
 const Header: React.FC = () => {
   const { data: session, status } = useSession();
@@ -60,7 +60,7 @@ const Header: React.FC = () => {
   return (
     <Flex
       as="nav"
-      bg="gray.700"
+      bg={MAIN_COLOR}
       color="gray.50"
       align="center"
       justify="space-between"
